@@ -163,16 +163,15 @@ export function PlaceBetPage() {
                     { label: '100%', value: currentPrice },
                     { label: 'Мин.', value: minPrice },
                     { label: 'Макс.', value: maxPrice },
-                  ]
-                    .filter((preset) => preset.value >= minPrice && preset.value <= maxPrice)
-                    .map((preset) => (
+                  ].map((preset) => (
                       <button
                         key={preset.label}
                         type="button"
                         onClick={() => {
+                          const clamped = Math.max(minPrice, Math.min(preset.value, maxPrice))
                           const aligned = step > 0
-                            ? Math.ceil((preset.value - minPrice) / step) * step + minPrice
-                            : preset.value
+                            ? Math.ceil((clamped - minPrice) / step) * step + minPrice
+                            : clamped
                           setValue('price', Math.min(aligned, maxPrice), { shouldValidate: true })
                         }}
                         className={`inline-flex items-center rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors ${
