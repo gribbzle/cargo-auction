@@ -102,7 +102,6 @@ afterAll(() => server.close())
 function createTestRouter(uuid = 'test-uuid-1') {
   const rootRoute = createRootRoute({
     component: () => <PlaceBetPage />,
-    params: { auctionUuid: uuid },
   })
 
   const placeBetRoute = createRoute({

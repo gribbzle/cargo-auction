@@ -4,7 +4,6 @@ import { setupServer } from 'msw/node'
 import { renderWithProviders, screen, waitFor } from '@/test-utils'
 import { AuctionsListPage } from '@/pages/auctions-list/ui/auctions-list-page.component'
 import { createRouter, createRoute, createRootRoute, createMemoryHistory, RouterProvider } from '@tanstack/react-router'
-import { auctionsListRoute } from '@/app/router/router'
 
 function createTestRouter() {
   const rootRoute = createRootRoute({
