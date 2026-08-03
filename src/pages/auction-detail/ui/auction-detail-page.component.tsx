@@ -4,6 +4,7 @@ import { auctionKeys } from '@/shared/lib/query-keys'
 import { fetchAuctionDetail } from '@/shared/api/auction-api'
 import { Badge, Button, Skeleton } from '@/shared/ui'
 import { Breadcrumbs } from '@/shared/ui/layout'
+import { FavoriteButton } from '@/features/favorite-toggle'
 import { formatCurrency, formatDate } from '@/widgets/auction-card/lib/formatters'
 import { getAuctionTypeBadge, getStatusBadge, getTradingStatusBadge } from '@/widgets/auction-card/lib/badges'
 import type { AuctionShowResponse, RoutePoint } from '@/shared/api/dto'
@@ -44,7 +45,7 @@ export function AuctionDetailPage() {
         ]}
       />
 
-      <Header data={data} />
+      <Header data={data} uuid={auctionUuid} />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
         {/* Main content — 2 columns */}
@@ -65,7 +66,7 @@ export function AuctionDetailPage() {
   )
 }
 
-function Header({ data }: { data: AuctionShowResponse }) {
+function Header({ data, uuid }: { data: AuctionShowResponse; uuid: string }) {
   return (
     <div className="flex flex-wrap items-center gap-3">
       <h2 className="text-xl font-semibold text-gray-900">{data.main.cargo_num}</h2>
@@ -74,9 +75,7 @@ function Header({ data }: { data: AuctionShowResponse }) {
       <Badge variant={getTradingStatusBadge(data.trading.status_mobile)}>
         {data.trading.status_mobile}
       </Badge>
-      {data.trading.is_favorite && (
-        <span className="text-amber-500 text-lg">★</span>
-      )}
+      <FavoriteButton auctionUuid={uuid} isFavorite={data.trading.is_favorite} />
     </div>
   )
 }

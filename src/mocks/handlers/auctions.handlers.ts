@@ -210,4 +210,23 @@ export const handlers = [
 
     return new HttpResponse(null, { status: 200 })
   }),
+
+  http.post(`${API_BASE}/auctions/:uuid/favorite`, async ({ params }) => {
+    await delay(50)
+    const uuid = params.uuid as string
+    const auction = auctionStore.get(uuid)
+
+    if (!auction) {
+      return HttpResponse.json(
+        { code: 'not_found', title: 'Not Found', message: 'Auction not found' },
+        { status: 404 },
+      )
+    }
+
+    const newState = !auction.detail.trading.is_favorite
+    auctionStore.updateTradingState(uuid, { is_favorite: newState })
+    auction.data.trading.is_favorite = newState
+
+    return HttpResponse.json({ is_favorite: newState })
+  }),
 ]

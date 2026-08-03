@@ -34,3 +34,9 @@ export async function setBet(
 ): Promise<void> {
   return post<void>(`/auctions/${auctionUuid}/bets`, data)
 }
+
+export async function toggleFavorite(
+  auctionUuid: string,
+): Promise<{ is_favorite: boolean }> {
+  return post<{ is_favorite: boolean }>(`/auctions/${auctionUuid}/favorite`)
+}

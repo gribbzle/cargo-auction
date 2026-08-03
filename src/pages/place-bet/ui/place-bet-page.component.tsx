@@ -68,6 +68,7 @@ export function PlaceBetPage() {
     register,
     handleSubmit,
     watch,
+    setValue,
     formState: { errors },
   } = useForm<BetForm>({
     resolver: zodResolver(schema),
@@ -150,6 +151,45 @@ export function PlaceBetPage() {
                 </p>
               )}
             </div>
+
+            {/* Quick bet buttons */}
+            {currentPrice > 0 && (
+              <div className="mb-6">
+                <span className="text-sm font-medium text-gray-700 block mb-2">Быстрая ставка</span>
+                <div className="flex flex-wrap gap-2">
+                  {[
+                    { label: '90%', value: Math.floor(currentPrice * 0.9) },
+                    { label: '95%', value: Math.floor(currentPrice * 0.95) },
+                    { label: '100%', value: currentPrice },
+                    { label: 'Мин.', value: minPrice },
+                    { label: 'Макс.', value: maxPrice },
+                  ]
+                    .filter((preset) => preset.value >= minPrice && preset.value <= maxPrice)
+                    .map((preset) => (
+                      <button
+                        key={preset.label}
+                        type="button"
+                        onClick={() => {
+                          const aligned = step > 0
+                            ? Math.ceil((preset.value - minPrice) / step) * step + minPrice
+                            : preset.value
+                          setValue('price', Math.min(aligned, maxPrice), { shouldValidate: true })
+                        }}
+                        className={`inline-flex items-center rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors ${
+                          watchPrice === preset.value
+                            ? 'border-sky-500 bg-sky-50 text-sky-700'
+                            : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50'
+                        }`}
+                      >
+                        {preset.label}
+                        <span className="ml-1 text-xs text-gray-400">
+                          {formatCurrency(preset.value)}
+                        </span>
+                      </button>
+                    ))}
+                </div>
+              </div>
+            )}
 
             {/* Actions */}
             <div className="flex gap-3">

@@ -3,6 +3,7 @@ import { Link } from '@tanstack/react-router'
 import type { AuctionListItem } from '@/shared/api/dto'
 import { Badge } from '@/shared/ui'
 import { usePrefetchAuction } from '@/features/prefetch-auction'
+import { FavoriteButton } from '@/features/favorite-toggle'
 import { formatCurrency, formatWeight, formatVolume, formatDate } from '../lib/formatters'
 import { getAuctionTypeBadge, getStatusBadge, getTradingStatusBadge } from '../lib/badges'
 import { getActionButton } from '../lib/action'
@@ -36,9 +37,7 @@ export function AuctionCard({ auction }: AuctionCardProps) {
             {trading.status_mobile}
           </Badge>
         </div>
-        {trading.is_favorite && (
-          <span className="text-amber-500 text-lg" title="В избранном">★</span>
-        )}
+        <FavoriteButton auctionUuid={auction.uuid} isFavorite={trading.is_favorite} />
       </div>
 
       {/* Route: load → unload */}
