@@ -30,6 +30,17 @@ export class ValidationError extends ApiError {
   }
 }
 
+const MAX_RETRIES = 2
+const INITIAL_RETRY_DELAY = 1000
+
+async function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms))
+}
+
+function isRetryable(error: AxiosError): boolean {
+  return !error.response || error.response.status === 503
+}
+
 const client = axios.create({
   baseURL: API_BASE_URL,
   timeout: 15_000,
@@ -40,7 +51,16 @@ const client = axios.create({
 
 client.interceptors.response.use(
   (response) => response,
-  (error: AxiosError) => {
+  async (error: AxiosError) => {
+    const config = error.config as AxiosRequestConfig & { _retryCount?: number } | undefined
+
+    if (config && isRetryable(error) && (config._retryCount ?? 0) < MAX_RETRIES) {
+      config._retryCount = (config._retryCount ?? 0) + 1
+      const delay = INITIAL_RETRY_DELAY * Math.pow(2, config._retryCount - 1)
+      await sleep(delay)
+      return client.request(config)
+    }
+
     if (error.response?.status === 401) {
       toast.error('Сессия истекла')
     }

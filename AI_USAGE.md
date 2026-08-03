@@ -25,7 +25,7 @@ This document describes how AI was used in the development of the Cargo Auction 
 - **MSW v2 mock server** — 5 handlers, mutable in-memory store, 25-seed auction data generator
 - **Mock Cities Dictionary** — 50 Russian cities with search function
 - **Zustand UI store** — sidebar/collapsed state management
-- **Axios HTTP client** — interceptors for 401 toast, 422 ValidationError parsing
+- **Axios HTTP client** — interceptors for 401 toast, 503 retry (exponential backoff, 2 attempts), 422 ValidationError parsing
 
 ### Testing
 - **Vitest + React Testing Library** setup with jsdom
@@ -112,7 +112,6 @@ Every requirement from the test assignment checklist was verified:
 | **No real API integration** | All data is mocked via MSW. Real API may have different response shapes. | MSW handlers match documented OpenAPI contract. DTO types can be adjusted. |
 | **No authentication flow** | MSW always returns authorized state. 401 interceptor shows toast but has no login page. | Test assignment doesn't require login. Toast provides user feedback. |
 | **No production build optimization** | Single dev Dockerfile only. No tree-shaking analysis, no bundle splitting. | Not required by test assignment. |
-| **503 retry not implemented** | Response interceptor only handles 401 and 422. 503 retry with exponential backoff planned but not built. | Low priority — MSW never returns 503. Can be added when connecting to real API. |
 | **No error boundary on every route** | Single root-level ErrorBoundary. Nested errors may not be caught. | Sufficient for test assignment scope. |
 | **City dictionary is static** | 50 hardcoded cities. Real app would fetch from API. | Test assignment requires mock dictionary. |
 | **No SSR/SSG** | CSR only via Vite. No SEO optimization. | Not applicable — this is an auction platform, not a content site. |
@@ -121,10 +120,8 @@ Every requirement from the test assignment checklist was verified:
 
 ## 6. What Would Be Improved With One More Day
 
-1. **503 retry with exponential backoff** — complete the HTTP client interceptor
-2. **More integration test scenarios** — test filter combinations, form validation edge cases, error states
-3. **Bundle optimization** — route-based code splitting with React.lazy + Suspense
-4. **Storybook** — visual component documentation and testing
-5. **CI/CD pipeline** — GitHub Actions for lint, typecheck, test on PR
-6. **E2E tests** — critical user flows with Playwright
-7. **Performance audit** — Lighthouse score optimization, virtualized auction list for large datasets
+1. **More integration test scenarios** — test filter combinations, form validation edge cases, error states
+2. **Bundle optimization** — route-based code splitting with React.lazy + Suspense
+3. **Storybook** — visual component documentation and testing
+4. **E2E tests** — critical user flows with Playwright
+5. **Performance audit** — Lighthouse score optimization, virtualized auction list for large datasets
