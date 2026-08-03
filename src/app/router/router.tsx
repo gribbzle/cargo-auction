@@ -3,6 +3,7 @@ import { AuctionsListPage } from '@/pages/auctions-list/ui/auctions-list-page.co
 import { AuctionDetailPage } from '@/pages/auction-detail/ui/auction-detail-page.component'
 import { PlaceBetPage } from '@/pages/place-bet/ui/place-bet-page.component'
 import { AuctionBetsPage } from '@/pages/auction-bets/ui/auction-bets-page.component'
+import { auctionListSearchSchema } from './search-params'
 
 const rootRoute = createRootRoute({
   component: RootLayout,
@@ -32,9 +33,14 @@ const indexRoute = createRoute({
   },
 })
 
-const auctionsListRoute = createRoute({
+export const auctionsListRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/auctions',
+  validateSearch: (search: Record<string, unknown>) => {
+    const result = auctionListSearchSchema.safeParse(search)
+    if (!result.success) return {}
+    return result.data
+  },
   component: AuctionsListPage,
 })
 

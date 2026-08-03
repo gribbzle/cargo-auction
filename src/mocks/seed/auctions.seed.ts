@@ -40,6 +40,7 @@ function generateAuctionListItem(index: number): AuctionListItem {
   const currentPrice = randomInt(50000, 500000)
 
   return {
+    uuid: '',
     main: {
       id: index + 1,
       cargo_num: `ЗАЯВ-${String(index + 1).padStart(4, '0')}`,
@@ -277,10 +278,14 @@ function generateBets(auctionId: number, count: number): BetItem[] {
 
 export function generateSeedData(): AuctionSeed[] {
   const count = 25
-  const items = Array.from({ length: count }, (_, i) => generateAuctionListItem(i))
-
-  return items.map((item) => {
+  const items = Array.from({ length: count }, (_, i) => {
+    const item = generateAuctionListItem(i)
     const uuid = generateUuid()
+    item.uuid = uuid
+    return { item, uuid }
+  })
+
+  return items.map(({ item, uuid }) => {
     return {
       uuid,
       data: item,

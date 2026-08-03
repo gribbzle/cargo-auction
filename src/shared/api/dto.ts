@@ -188,6 +188,7 @@ export interface AuctionListItemPayment {
 }
 
 export interface AuctionListItem {
+  uuid: string
   main: AuctionListItemMain
   organizer: AuctionListItemOrganizer
   route: AuctionListItemRoute

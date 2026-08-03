@@ -63,7 +63,7 @@ export const handlers = [
     const paginated = filtered.slice(start, end)
 
     return HttpResponse.json({
-      data: paginated.map((a) => a.data),
+      data: paginated.map((a) => ({ ...a.data, uuid: a.uuid })),
       meta: {
         current_page: page,
         from: start + 1,
