@@ -116,9 +116,11 @@ export function AuctionBetsPage() {
 }
 
 function BetRow({ bet }: { bet: BetItem }) {
+  const isOwn = bet.subscriber_id === 1
+
   return (
     <div className={`grid grid-cols-12 gap-4 px-5 py-3 border-b border-gray-100 last:border-0 text-sm ${
-      bet.is_win ? 'bg-emerald-50' : bet.is_rejected ? 'bg-red-50' : ''
+      isOwn ? 'bg-amber-50' : bet.is_win ? 'bg-emerald-50' : bet.is_rejected ? 'bg-red-50' : ''
     }`}>
       <div className="col-span-1 font-medium text-gray-900">
         {bet.place != null ? `#${bet.place}` : '—'}

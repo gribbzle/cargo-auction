@@ -292,8 +292,8 @@ function generateAuctionDetail(item: AuctionListItem): AuctionShowResponse {
   }
 }
 
-function generateBets(auctionId: number, count: number): BetItem[] {
-  return Array.from({ length: count }, (_, i) => ({
+function generateBets(auctionId: number, count: number, userBet?: { price_with_vat: number; price_no_vat: number }): BetItem[] {
+  const otherBets: BetItem[] = Array.from({ length: count }, (_, i) => ({
     id: auctionId * 1000 + i + 1,
     created_at: new Date(Date.now() - randomInt(0, 48) * 3600000).toISOString(),
     auction_id: auctionId,
@@ -308,8 +308,8 @@ function generateBets(auctionId: number, count: number): BetItem[] {
     transporter_comment: null,
     is_rejected: i === count - 1 && Math.random() > 0.7,
     is_counter: false,
-    place: i + 1,
-    is_win: i === 0,
+    place: null,
+    is_win: false,
     run_number: 0,
     cancel_reason: i === count - 1 && Math.random() > 0.7 ? 'Не прошёл отбор' : '',
     price_info: {
@@ -319,6 +319,48 @@ function generateBets(auctionId: number, count: number): BetItem[] {
       vat_rate: '20',
     },
   }))
+
+  const bets = userBet
+    ? [
+        ...otherBets,
+        {
+          id: auctionId * 10000,
+          created_at: new Date().toISOString(),
+          auction_id: auctionId,
+          subscriber_id: 1,
+          contact_name: 'Текущий пользователь',
+          contact_phone: '+7 (999) 123-45-67',
+          price_with_vat: userBet.price_with_vat,
+          price_no_vat: userBet.price_no_vat,
+          organization_id: 1,
+          organization_inn: '7700000001',
+          organization_name: 'Моя организация',
+          transporter_comment: null,
+          is_rejected: false,
+          is_counter: false,
+          place: null,
+          is_win: false,
+          run_number: 0,
+          cancel_reason: '',
+          price_info: {
+            price_with_vat: userBet.price_with_vat,
+            price_no_vat: userBet.price_no_vat,
+            payment_type: 'Безналичный',
+            vat_rate: '20',
+          },
+        },
+      ]
+    : otherBets
+
+  bets
+    .filter((b) => !b.is_rejected)
+    .sort((a, b) => a.price_with_vat - b.price_with_vat)
+    .forEach((b, i) => {
+      b.place = i + 1
+      b.is_win = i === 0
+    })
+
+  return bets
 }
 
 export function generateSeedData(): AuctionSeed[] {
@@ -331,11 +373,15 @@ export function generateSeedData(): AuctionSeed[] {
   })
 
   return items.map(({ item, uuid }) => {
+    const userBet = item.trading.your?.last_bet != null
+      ? { price_with_vat: item.trading.your.last_bet, price_no_vat: Math.round(item.trading.your.last_bet * 0.8) }
+      : undefined
+
     return {
       uuid,
       data: item,
       detail: generateAuctionDetail(item),
-      bets: generateBets(item.main.id, randomInt(0, 8)),
+      bets: generateBets(item.main.id, randomInt(0, 8), userBet),
     }
   })
 }
