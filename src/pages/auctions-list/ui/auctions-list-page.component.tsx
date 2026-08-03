@@ -89,16 +89,20 @@ export function AuctionsListPage() {
 
       <div className="mt-6 space-y-4">
         {isLoading ? (
-          Array.from({ length: 5 }).map((_, i) => (
-            <div key={i} className="rounded-xl border border-gray-200 bg-white p-5">
-              <Skeleton className="h-5 w-48 mb-3" />
-              <Skeleton className="h-4 w-72 mb-2" />
-              <Skeleton className="h-4 w-56" />
-            </div>
-          ))
+          <div role="status" aria-label="Загрузка аукционов">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <div key={i} className="rounded-xl border border-gray-200 bg-white p-5 mb-4">
+                <Skeleton className="h-5 w-48 mb-3" />
+                <Skeleton className="h-4 w-72 mb-2" />
+                <Skeleton className="h-4 w-56" />
+              </div>
+            ))}
+          </div>
         ) : data?.data.length === 0 ? (
-          <div className="rounded-xl border border-gray-200 bg-white p-8 text-center text-gray-500">
-            Ничего не найдено
+          <div className="rounded-xl border border-gray-200 bg-white p-12 text-center" role="status">
+            <div className="text-5xl mb-4" aria-hidden="true">🔍</div>
+            <p className="text-lg font-medium text-gray-700 mb-1">Ничего не найдено</p>
+            <p className="text-sm text-gray-400">Попробуйте изменить параметры поиска или сбросить фильтры</p>
           </div>
         ) : (
           data?.data.map((auction) => (

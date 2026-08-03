@@ -25,7 +25,8 @@ export function AuctionDetailPage() {
     return (
       <div>
         <Breadcrumbs items={[{ label: 'Аукционы', to: '/auctions' }, { label: 'Ошибка' }]} />
-        <div className="rounded-xl border border-red-200 bg-red-50 p-8 text-center">
+        <div className="rounded-xl border border-red-200 bg-red-50 p-12 text-center" role="alert">
+          <div className="text-4xl mb-3" aria-hidden="true">⚠️</div>
           <p className="text-red-700 font-medium">Ошибка загрузки аукциона</p>
           <p className="text-red-500 text-sm mt-1">Попробуйте обновить страницу</p>
           <Link to="/auctions">

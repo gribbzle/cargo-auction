@@ -1,8 +1,9 @@
-import { createRouter, createRoute, createRootRoute, redirect, Outlet } from '@tanstack/react-router'
+import { createRouter, createRoute, createRootRoute, redirect, Outlet, Link } from '@tanstack/react-router'
 import { AuctionsListPage } from '@/pages/auctions-list/ui/auctions-list-page.component'
 import { AuctionDetailPage } from '@/pages/auction-detail/ui/auction-detail-page.component'
 import { PlaceBetPage } from '@/pages/place-bet/ui/place-bet-page.component'
 import { AuctionBetsPage } from '@/pages/auction-bets/ui/auction-bets-page.component'
+import { ErrorBoundary } from '@/shared/ui'
 import { auctionListSearchSchema } from './search-params'
 
 const rootRoute = createRootRoute({
@@ -15,11 +16,15 @@ function RootLayout() {
     <div className="min-h-screen bg-gray-50">
       <header className="bg-white border-b border-gray-200 px-4 py-3">
         <div className="max-w-7xl mx-auto">
-          <h1 className="text-lg font-semibold text-gray-900">Cargo Auction</h1>
+          <Link to="/auctions" className="text-lg font-semibold text-gray-900 hover:text-sky-600 transition-colors">
+            Cargo Auction
+          </Link>
         </div>
       </header>
-      <main className="max-w-7xl mx-auto px-4 py-6">
-        <Outlet />
+      <main className="max-w-7xl mx-auto px-4 py-6" role="main">
+        <ErrorBoundary>
+          <Outlet />
+        </ErrorBoundary>
       </main>
     </div>
   )

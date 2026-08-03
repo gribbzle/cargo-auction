@@ -42,10 +42,11 @@ export function FavoriteButton({ auctionUuid, isFavorite }: FavoriteButtonProps)
       type="button"
       onClick={() => mutation.mutate()}
       disabled={mutation.isPending}
-      className={`text-2xl transition-colors hover:scale-110 disabled:opacity-50 ${
+      aria-label={isFavorite ? 'Убрать из избранного' : 'Добавить в избранное'}
+      aria-pressed={isFavorite}
+      className={`text-2xl transition-colors hover:scale-110 disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 rounded ${
         isFavorite ? 'text-amber-500' : 'text-gray-300 hover:text-amber-400'
       }`}
-      title={isFavorite ? 'Убрать из избранного' : 'В избранное'}
     >
       {isFavorite ? '★' : '☆'}
     </button>

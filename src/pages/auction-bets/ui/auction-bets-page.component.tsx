@@ -63,40 +63,52 @@ export function AuctionBetsPage() {
       </div>
 
       {sortedBets.length === 0 ? (
-        <div className="rounded-xl border border-gray-200 bg-white p-8 text-center text-gray-500">
-          Ставок пока нет
+        <div className="rounded-xl border border-gray-200 bg-white p-8 text-center text-gray-500" role="status">
+          <div className="text-4xl mb-3" aria-hidden="true">📋</div>
+          <p className="font-medium text-gray-700">Ставок пока нет</p>
+          <p className="text-sm text-gray-400 mt-1">Будьте первым, кто сделает ставку</p>
         </div>
       ) : (
         <div className="rounded-xl border border-gray-200 bg-white overflow-hidden">
+          <div className="overflow-x-auto">
           {/* Table header */}
-          <div className="grid grid-cols-12 gap-4 px-5 py-3 bg-gray-50 border-b border-gray-200 text-xs font-medium text-gray-500 uppercase tracking-wider">
+          <div className="grid grid-cols-12 gap-4 px-5 py-3 bg-gray-50 border-b border-gray-200 text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[700px]">
             <button
+              type="button"
               onClick={() => toggleSort('place')}
-              className="col-span-1 text-left hover:text-gray-700 flex items-center gap-1"
+              aria-label={`Сортировать по месту ${sortField === 'place' ? (sortDir === 'asc' ? 'по убыванию' : 'по возрастанию') : ''}`}
+              className="col-span-1 text-left hover:text-gray-700 flex items-center gap-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 rounded"
             >
               Место {sortField === 'place' && (sortDir === 'asc' ? '↑' : '↓')}
             </button>
             <div className="col-span-3">Организация</div>
             <button
+              type="button"
               onClick={() => toggleSort('price')}
-              className="col-span-2 text-left hover:text-gray-700 flex items-center gap-1"
+              aria-label={`Сортировать по сумме ${sortField === 'price' ? (sortDir === 'asc' ? 'по убыванию' : 'по возрастанию') : ''}`}
+              className="col-span-2 text-left hover:text-gray-700 flex items-center gap-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 rounded"
             >
               Сумма {sortField === 'price' && (sortDir === 'asc' ? '↑' : '↓')}
             </button>
             <div className="col-span-2">Без НДС</div>
             <div className="col-span-2">Контакт</div>
             <button
+              type="button"
               onClick={() => toggleSort('date')}
-              className="col-span-2 text-left hover:text-gray-700 flex items-center gap-1"
+              aria-label={`Сортировать по дате ${sortField === 'date' ? (sortDir === 'asc' ? 'по убыванию' : 'по возрастанию') : ''}`}
+              className="col-span-2 text-left hover:text-gray-700 flex items-center gap-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 rounded"
             >
               Дата {sortField === 'date' && (sortDir === 'asc' ? '↑' : '↓')}
             </button>
           </div>
 
           {/* Rows */}
+          <div className="min-w-[700px]">
           {sortedBets.map((bet) => (
             <BetRow key={bet.id} bet={bet} />
           ))}
+          </div>
+          </div>
         </div>
       )}
     </div>

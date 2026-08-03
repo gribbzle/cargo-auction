@@ -22,10 +22,11 @@ export function AuctionCard({ auction }: AuctionCardProps) {
   }, [prefetchAuction, auction.uuid])
 
   return (
-    <div
+    <article
       className="rounded-xl border border-gray-200 bg-white p-5 hover:shadow-md transition-shadow"
       onMouseEnter={handlePrefetch}
       onFocus={handlePrefetch}
+      aria-label={`Аукцион ${main.cargo_num}`}
     >
       {/* Header: cargo num + badges */}
       <div className="flex items-start justify-between gap-3 mb-3">
@@ -99,18 +100,22 @@ export function AuctionCard({ auction }: AuctionCardProps) {
       <div className="flex items-center justify-between">
         <span className="text-xs text-gray-500">{organizer.organization_name}</span>
         {action.disabled ? (
-          <span className="inline-flex items-center rounded-lg bg-gray-100 px-4 py-2 text-sm font-medium text-gray-400 cursor-not-allowed">
+          <span
+            aria-disabled="true"
+            className="inline-flex items-center rounded-lg bg-gray-100 px-4 py-2 text-sm font-medium text-gray-400 cursor-not-allowed"
+          >
             {action.label}
           </span>
         ) : action.href ? (
           <Link
             to={action.href}
-            className="inline-flex items-center rounded-lg bg-sky-600 px-4 py-2 text-sm font-medium text-white hover:bg-sky-700 transition-colors"
+            aria-label={`${action.label} — ${main.cargo_num}`}
+            className="inline-flex items-center rounded-lg bg-sky-600 px-4 py-2 text-sm font-medium text-white hover:bg-sky-700 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:ring-offset-2"
           >
             {action.label}
           </Link>
         ) : null}
       </div>
-    </div>
+    </article>
   )
 }

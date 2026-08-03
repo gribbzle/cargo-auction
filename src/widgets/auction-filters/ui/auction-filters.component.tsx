@@ -16,6 +16,7 @@ interface AuctionFiltersWidgetProps {
 
 export function AuctionFiltersWidget({ filters, onFiltersChange }: AuctionFiltersWidgetProps) {
   const [localFilters, setLocalFilters] = useState<AuctionFilters>(filters)
+  const [mobileOpen, setMobileOpen] = useState(false)
 
   function update(key: keyof AuctionFilters, value: unknown) {
     setLocalFilters((prev) => ({ ...prev, [key]: value, page: 1 }))
@@ -46,9 +47,45 @@ export function AuctionFiltersWidget({ filters, onFiltersChange }: AuctionFilter
     description: c.region,
   }))
 
+  const hasActiveFilters =
+    localFilters.cargo_num ||
+    localFilters.load_city ||
+    localFilters.unload_city ||
+    localFilters.auc_type?.length ||
+    localFilters.status?.length ||
+    localFilters.load_date_from ||
+    localFilters.load_date_to ||
+    localFilters.price_from ||
+    localFilters.price_to ||
+    localFilters.is_available ||
+    localFilters.is_bidder
+
   return (
     <div className="rounded-xl border border-gray-200 bg-white p-4">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* Mobile toggle */}
+      <button
+        type="button"
+        onClick={() => setMobileOpen(!mobileOpen)}
+        className="w-full flex items-center justify-between sm:hidden text-sm font-medium text-gray-700 mb-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 rounded"
+        aria-expanded={mobileOpen}
+        aria-controls="auction-filters-content"
+      >
+        <span className="flex items-center gap-2">
+          Фильтры
+          {hasActiveFilters && (
+            <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-sky-600 text-white text-xs" aria-label="Активные фильтры">
+              {[localFilters.cargo_num, localFilters.load_city, localFilters.unload_city, localFilters.auc_type?.length, localFilters.status?.length, localFilters.load_date_from, localFilters.load_date_to, localFilters.price_from, localFilters.price_to, localFilters.is_available, localFilters.is_bidder].filter(Boolean).length}
+            </span>
+          )}
+        </span>
+        <span className={`transition-transform ${mobileOpen ? 'rotate-180' : ''}`} aria-hidden="true">▼</span>
+      </button>
+
+      <div
+        id="auction-filters-content"
+        className={`${mobileOpen ? 'block' : 'hidden'} sm:block`}
+      >
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* cargo_num */}
         <Input
           label="Номер заявки"
@@ -184,6 +221,7 @@ export function AuctionFiltersWidget({ filters, onFiltersChange }: AuctionFilter
         <Button variant="secondary" onClick={handleReset}>
           Сбросить
         </Button>
+      </div>
       </div>
     </div>
   )
