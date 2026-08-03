@@ -25,7 +25,8 @@ This document describes how AI was used in the development of the Cargo Auction 
 - **MSW v2 mock server** — 5 handlers, mutable in-memory store, 25-seed auction data generator
 - **Mock Cities Dictionary** — 50 Russian cities with search function
 - **Zustand UI store** — sidebar/collapsed state management
-- **Axios HTTP client** — interceptors for 401 toast, 503 retry (exponential backoff, 2 attempts), 422 ValidationError parsing
+- **Axios HTTP client** — interceptors for 401 toast, 422 ValidationError parsing
+- **TanStack Query** — retry on 5xx/network errors (2 attempts, exponential backoff), no retry on 4xx
 
 ### Testing
 - **Vitest + React Testing Library** setup with jsdom
