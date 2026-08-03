@@ -35,8 +35,14 @@ function generateAuctionListItem(index: number): AuctionListItem {
   const loadCity = randomItem(cities)
   const unloadCity = randomItem(cities.filter((c) => c.gc_id !== loadCity.gc_id))
   const aucType = randomItem(aucTypes)
-  const status = randomItem(statuses)
-  const tradingStatus = randomItem(tradingStatuses)
+
+  // Ensure first 8 auctions are active (can_set_bet = true) for demo purposes
+  const isActiveAuction = index < 8
+  const status = isActiveAuction ? 'Auction' as const : randomItem(statuses)
+  const tradingStatus = isActiveAuction
+    ? randomItem(['NotParticipating', 'Leading', 'Losing', 'OnPending'] as const)
+    : randomItem(tradingStatuses)
+
   const currentPrice = randomInt(50000, 500000)
 
   return {
