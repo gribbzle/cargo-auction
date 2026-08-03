@@ -12,6 +12,7 @@ import { Breadcrumbs } from '@/shared/ui/layout'
 import { Badge } from '@/shared/ui'
 import { formatCurrency, formatDate } from '@/widgets/auction-card/lib/formatters'
 import { getAuctionTypeBadge, getStatusBadge } from '@/widgets/auction-card/lib/badges'
+import { createPlaceBetSchema } from '@/features/place-bet/model/place-bet.schema'
 
 export function PlaceBetPage() {
   const { auctionUuid } = useParams({ from: '/auctions/$auctionUuid/place-bet' })
@@ -51,16 +52,7 @@ export function PlaceBetPage() {
   const step = price?.step ?? 1
   const currentPrice = price?.current ?? 0
 
-  const schema = z.object({
-    price: z
-      .number({ error: 'Введите число' })
-      .min(minPrice, `Минимальная ставка: ${formatCurrency(minPrice)}`)
-      .max(maxPrice, `Максимальная ставка: ${formatCurrency(maxPrice)}`)
-      .refine(
-        (val) => step > 0 ? (val - minPrice) % step === 0 : true,
-        `Шаг ставки: ${formatCurrency(step)}`,
-      ),
-  })
+  const schema = createPlaceBetSchema(price ?? { min: 0, max: Infinity, step: 1, current: 0, start: 0, current_no_vat: 0, min_no_vat: 0, max_no_vat: 0, start_no_vat: 0, available: 0, available_no_vat: 0, step_no_vat: 0, price_per_km: 0 })
 
   type BetForm = z.infer<typeof schema>
 
