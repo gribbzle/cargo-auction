@@ -35,7 +35,7 @@ export function PlaceBetPage() {
       if (error instanceof ValidationError) {
         const fieldError = error.errors.find((e) => e.field === 'price')
         if (fieldError) {
-          toast.error(fieldError.message)
+          setError('price', { message: fieldError.message })
         } else {
           toast.error(error.message)
         }
@@ -69,6 +69,7 @@ export function PlaceBetPage() {
     handleSubmit,
     watch,
     setValue,
+    setError,
     formState: { errors },
   } = useForm<BetForm>({
     resolver: zodResolver(schema),
