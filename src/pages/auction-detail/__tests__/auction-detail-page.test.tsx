@@ -94,7 +94,7 @@ const mockAuction = {
         lat: 55.75,
       },
       cargo: { name: 'Груз', package_name: '', weight: '5', volume: '20', length: '', width: '', height: '', oversized: false, package_amount: null },
-      contact: { name: 'Контакт', phone: '+7 (999) 123-45-67' },
+      contact: { name: 'Иван Контакт', phone: '+7 (999) 123-45-67' },
     },
   ],
   admitted_organizations: [],
@@ -226,5 +226,79 @@ describe('AuctionDetailPage integration', () => {
     await waitFor(() => {
       expect(screen.getByText('Ошибка загрузки аукциона')).toBeInTheDocument()
     })
+  })
+
+  it('hides "Смотреть ставки" when hide_bets_history is true', async () => {
+    server.use(
+      http.get('/api/v1/auctions/:uuid', async () => {
+        return HttpResponse.json({ ...mockAuction, trading: { ...mockAuction.trading, hide_bets_history: true } })
+      }),
+    )
+
+    const router = createTestRouter()
+    renderWithProviders(<RouterProvider router={router} />)
+
+    await waitFor(() => {
+      expect(screen.getByRole('heading', { name: 'ЗАЯВ-0001' })).toBeInTheDocument()
+    })
+
+    expect(screen.queryByText('Смотреть ставки')).not.toBeInTheDocument()
+  })
+
+  it('shows "Ставки не принимаются" when can_set_bet is false', async () => {
+    server.use(
+      http.get('/api/v1/auctions/:uuid', async () => {
+        return HttpResponse.json({ ...mockAuction, trading: { ...mockAuction.trading, can_set_bet: false } })
+      }),
+    )
+
+    const router = createTestRouter()
+    renderWithProviders(<RouterProvider router={router} />)
+
+    await waitFor(() => {
+      expect(screen.getByText('Ставки не принимаются')).toBeInTheDocument()
+    })
+
+    expect(screen.queryByText('Сделать ставку')).not.toBeInTheDocument()
+  })
+
+  it('hides route contact info when hide_points_address_and_contacts is true', async () => {
+    server.use(
+      http.get('/api/v1/auctions/:uuid', async () => {
+        return HttpResponse.json({
+          ...mockAuction,
+          trading: { ...mockAuction.trading, hide_points_address_and_contacts: true },
+        })
+      }),
+    )
+
+    const router = createTestRouter()
+    renderWithProviders(<RouterProvider router={router} />)
+
+    await waitFor(() => {
+      expect(screen.getByText('Маршрут')).toBeInTheDocument()
+    })
+
+    expect(screen.queryByText('Иван Контакт')).not.toBeInTheDocument()
+  })
+
+  it('hides cargo price when no_view_cargo_price is true', async () => {
+    server.use(
+      http.get('/api/v1/auctions/:uuid', async () => {
+        return HttpResponse.json({
+          ...mockAuction,
+          trading: { ...mockAuction.trading, no_view_cargo_price: true },
+        })
+      }),
+    )
+
+    const router = createTestRouter()
+    renderWithProviders(<RouterProvider router={router} />)
+
+    await waitFor(() => {
+      expect(screen.getByText('Груз и требования')).toBeInTheDocument()
+    })
+
+    expect(screen.queryByText('1 000 000 ₽')).not.toBeInTheDocument()
   })
 })

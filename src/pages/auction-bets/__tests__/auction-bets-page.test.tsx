@@ -220,4 +220,25 @@ describe('AuctionBetsPage integration', () => {
       expect(screen.getByText('← К аукциону')).toBeInTheDocument()
     })
   })
+
+  it('shows empty state when hide_bets_history is true', async () => {
+    server.use(
+      http.get('/api/v1/auctions/:uuid', async ({ params }) => {
+        if (params.uuid === 'test-uuid-1') {
+          return HttpResponse.json({ ...mockAuction, hide_bets_history: true })
+        }
+        return HttpResponse.json({ code: 'not_found', title: 'Not Found', message: 'Auction not found' }, { status: 404 })
+      }),
+      http.get('/api/v1/auctions/:uuid/bets', async () => {
+        return HttpResponse.json({ bets: [] })
+      }),
+    )
+
+    const router = createTestRouter()
+    renderWithProviders(<RouterProvider router={router} />)
+
+    await waitFor(() => {
+      expect(screen.getByText('Ставок пока нет')).toBeInTheDocument()
+    })
+  })
 })

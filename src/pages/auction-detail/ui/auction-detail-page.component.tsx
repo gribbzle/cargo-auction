@@ -82,7 +82,8 @@ function Header({ data, uuid }: { data: AuctionShowResponse; uuid: string }) {
 }
 
 function RouteSection({ data }: { data: AuctionShowResponse }) {
-  const { routes } = data
+  const { routes, trading } = data
+  const hideContacts = trading.hide_points_address_and_contacts
 
   return (
     <section className="rounded-xl border border-gray-200 bg-white p-5">
@@ -103,7 +104,7 @@ function RouteSection({ data }: { data: AuctionShowResponse }) {
       ) : (
         <div className="space-y-4">
           {routes.map((point) => (
-            <RoutePointCard key={point.row_num} point={point} />
+            <RoutePointCard key={point.row_num} point={point} hideContacts={hideContacts} />
           ))}
         </div>
       )}
@@ -111,7 +112,7 @@ function RouteSection({ data }: { data: AuctionShowResponse }) {
   )
 }
 
-function RoutePointCard({ point }: { point: RoutePoint }) {
+function RoutePointCard({ point, hideContacts }: { point: RoutePoint; hideContacts?: boolean }) {
   const isLoad = point.op_type === 'Loading'
   return (
     <div className={`rounded-lg border p-4 ${isLoad ? 'border-emerald-200 bg-emerald-50' : 'border-amber-200 bg-amber-50'}`}>
@@ -132,15 +133,19 @@ function RoutePointCard({ point }: { point: RoutePoint }) {
           <span className="text-gray-500 text-xs block">Дата</span>
           <span className="text-gray-900">{formatDate(point.start_date)} — {formatDate(point.end_date)}</span>
         </div>
-        <div>
-          <span className="text-gray-500 text-xs block">Контакт</span>
-          <span className="text-gray-900">{point.contact.name}</span>
-          <span className="text-gray-500 text-xs block">{point.contact.phone}</span>
-        </div>
-        <div>
-          <span className="text-gray-500 text-xs block">Подрядчик</span>
-          <span className="text-gray-900">{point.contractor}</span>
-        </div>
+        {!hideContacts && (
+          <>
+            <div>
+              <span className="text-gray-500 text-xs block">Контакт</span>
+              <span className="text-gray-900">{point.contact.name}</span>
+              <span className="text-gray-500 text-xs block">{point.contact.phone}</span>
+            </div>
+            <div>
+              <span className="text-gray-500 text-xs block">Подрядчик</span>
+              <span className="text-gray-900">{point.contractor}</span>
+            </div>
+          </>
+        )}
       </div>
       {point.cargo.name && (
         <div className="mt-3 pt-3 border-t border-gray-200 text-sm">
@@ -158,13 +163,14 @@ function RoutePointCard({ point }: { point: RoutePoint }) {
 }
 
 function CargoSection({ data }: { data: AuctionShowResponse }) {
-  const { cargo } = data
+  const { cargo, trading } = data
+  const hidePrice = trading.no_view_cargo_price
 
   return (
     <section className="rounded-xl border border-gray-200 bg-white p-5">
       <h3 className="text-sm font-semibold text-gray-900 mb-4">Груз и требования</h3>
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 text-sm">
-        <InfoField label="Стоимость груза" value={`${Number(cargo.price).toLocaleString('ru-RU')} ₽`} />
+        {!hidePrice && <InfoField label="Стоимость груза" value={`${Number(cargo.price).toLocaleString('ru-RU')} ₽`} />}
         <InfoField label="Расстояние" value={cargo.distance ? `${cargo.distance} км` : '—'} />
         <InfoField label="Кол-во машин" value={String(cargo.truck_count)} />
         <InfoField label="Тип кузова" value={cargo.body_type} />

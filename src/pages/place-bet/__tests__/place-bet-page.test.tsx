@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeAll, afterAll, afterEach } from 'vitest'
 import { http, HttpResponse } from 'msw'
 import { setupServer } from 'msw/node'
-import { renderWithProviders, screen, waitFor } from '@/test-utils'
+import { renderWithProviders, screen, waitFor, userEvent } from '@/test-utils'
 import { PlaceBetPage } from '@/pages/place-bet/ui/place-bet-page.component'
 import { createRouter, createRoute, createRootRoute, createMemoryHistory, RouterProvider } from '@tanstack/react-router'
 
@@ -99,7 +99,7 @@ beforeAll(() => server.listen())
 afterEach(() => server.resetHandlers())
 afterAll(() => server.close())
 
-function createTestRouter(uuid = 'test-uuid-1') {
+function createTestRouter(uuid = 'test-uuid-1', initialPath?: string) {
   const rootRoute = createRootRoute({
     component: () => <PlaceBetPage />,
   })
@@ -110,11 +110,17 @@ function createTestRouter(uuid = 'test-uuid-1') {
     component: () => <PlaceBetPage />,
   })
 
-  const routeTree = rootRoute.addChildren([placeBetRoute])
+  const detailRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/auctions/$auctionUuid',
+    component: () => <div>Auction Detail</div>,
+  })
+
+  const routeTree = rootRoute.addChildren([placeBetRoute, detailRoute])
   return createRouter({
     routeTree,
     defaultPreload: 'intent',
-    history: createMemoryHistory({ initialEntries: [`/auctions/${uuid}/place-bet`] }),
+    history: createMemoryHistory({ initialEntries: [initialPath ?? `/auctions/${uuid}/place-bet`] }),
   })
 }
 
@@ -165,5 +171,63 @@ describe('PlaceBetPage integration', () => {
       expect(screen.getByRole('navigation', { name: 'Breadcrumb' })).toBeInTheDocument()
       expect(screen.getAllByText('ЗАЯВ-0001').length).toBeGreaterThanOrEqual(1)
     })
+  })
+
+  it('submits bet and shows pending state', async () => {
+    const user = userEvent.setup()
+    const router = createTestRouter()
+    renderWithProviders(<RouterProvider router={router} />)
+
+    await waitFor(() => {
+      expect(screen.getByRole('heading', { name: 'Сделать ставку' })).toBeInTheDocument()
+    })
+
+    const input = screen.getByLabelText(/Ваша ставка/)
+    await user.clear(input)
+    await user.type(input, '150000')
+
+    const submitButton = screen.getByRole('button', { name: 'Подтвердить ставку' })
+    await user.click(submitButton)
+
+    await waitFor(() => {
+      expect(submitButton).toBeDisabled()
+    })
+  })
+
+  it('shows validation error for out-of-range price', async () => {
+    const user = userEvent.setup()
+    const router = createTestRouter()
+    renderWithProviders(<RouterProvider router={router} />)
+
+    await waitFor(() => {
+      expect(screen.getByRole('heading', { name: 'Сделать ставку' })).toBeInTheDocument()
+    })
+
+    const input = screen.getByLabelText(/Ваша ставка/)
+    await user.clear(input)
+    await user.type(input, '50000')
+
+    const submitButton = screen.getByRole('button', { name: 'Подтвердить ставку' })
+    await user.click(submitButton)
+
+    await waitFor(() => {
+      expect(screen.getByText(/Минимальная ставка/)).toBeInTheDocument()
+    })
+  })
+
+  it('sets min price via quick bet button', async () => {
+    const user = userEvent.setup()
+    const router = createTestRouter()
+    renderWithProviders(<RouterProvider router={router} />)
+
+    await waitFor(() => {
+      expect(screen.getByRole('heading', { name: 'Сделать ставку' })).toBeInTheDocument()
+    })
+
+    const minButton = screen.getByText('Мин.')
+    await user.click(minButton)
+
+    const input = screen.getByLabelText(/Ваша ставка/) as HTMLInputElement
+    expect(input.value).toBe('145000')
   })
 })
