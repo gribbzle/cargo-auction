@@ -156,6 +156,7 @@ export function PlaceBetPage() {
                 control={control}
                 render={({ field, fieldState }) => (
                   <Input
+                    id="price"
                     label="Ваша ставка (₽)"
                     type="number"
                     step={step}

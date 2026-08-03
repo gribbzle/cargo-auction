@@ -238,7 +238,7 @@ describe('PlaceBetPage integration', () => {
     const minButton = screen.getByText('Мин.')
     await user.click(minButton)
 
-    const input = screen.getByLabelText(/Ваша ставка/) as HTMLInputElement
+    const input = screen.getByTestId("price") as HTMLInputElement
     expect(input.value).toBe('145000')
   })
 })
