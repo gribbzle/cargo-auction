@@ -39,6 +39,15 @@ function createStore(): AuctionStore {
       const auction = auctions.get(uuid)
       if (auction) {
         auction.bets.push(bet)
+
+        auction.bets
+          .filter((b) => !b.is_rejected)
+          .sort((a, b) => a.price_with_vat - b.price_with_vat)
+          .forEach((b, i) => {
+            b.place = i + 1
+            b.is_win = i === 0
+          })
+
         auction.detail.trading.price.current = bet.price_with_vat
         auction.detail.trading.price.current_no_vat = bet.price_no_vat
         auction.detail.trading.your = {
