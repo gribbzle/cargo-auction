@@ -66,7 +66,7 @@ export function AuctionFiltersWidget({ filters, onFiltersChange }: AuctionFilter
       <button
         type="button"
         onClick={() => setMobileOpen(!mobileOpen)}
-        className="w-full flex items-center justify-between sm:hidden text-sm font-medium text-gray-700 mb-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 rounded"
+        className="w-full flex items-center justify-between sm:hidden text-sm font-medium text-gray-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 rounded"
         aria-expanded={mobileOpen}
         aria-controls="auction-filters-content"
       >
@@ -83,11 +83,12 @@ export function AuctionFiltersWidget({ filters, onFiltersChange }: AuctionFilter
 
       <div
         id="auction-filters-content"
-        className={`${mobileOpen ? 'block' : 'hidden'} sm:block`}
+        className={`${mobileOpen ? 'block' : 'hidden'} sm:block mt-3`}
       >
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* cargo_num */}
         <Input
+          id="cargo-num"
           label="Номер заявки"
           placeholder="ЗАЯВ-0001"
           value={localFilters.cargo_num ?? ''}
@@ -96,6 +97,7 @@ export function AuctionFiltersWidget({ filters, onFiltersChange }: AuctionFilter
 
         {/* load city */}
         <Combobox
+          id="load-city"
           label="Город погрузки"
           options={cityOptions}
           value={localFilters.load_city ?? ''}
@@ -105,6 +107,7 @@ export function AuctionFiltersWidget({ filters, onFiltersChange }: AuctionFilter
 
         {/* unload city */}
         <Combobox
+          id="unload-city"
           label="Город выгрузки"
           options={cityOptions}
           value={localFilters.unload_city ?? ''}
@@ -114,6 +117,7 @@ export function AuctionFiltersWidget({ filters, onFiltersChange }: AuctionFilter
 
         {/* per_page */}
         <Select
+          id="per-page"
           label="На странице"
           options={PER_PAGE_OPTIONS}
           value={String(localFilters.per_page ?? 20)}
@@ -166,18 +170,21 @@ export function AuctionFiltersWidget({ filters, onFiltersChange }: AuctionFilter
       {/* Date range + Price range + Toggles */}
       <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <Input
+          id="load-date-from"
           label="Дата погрузки от"
           type="date"
           value={localFilters.load_date_from ?? ''}
           onChange={(e) => update('load_date_from', e.target.value || undefined)}
         />
         <Input
+          id="load-date-to"
           label="Дата погрузки до"
           type="date"
           value={localFilters.load_date_to ?? ''}
           onChange={(e) => update('load_date_to', e.target.value || undefined)}
         />
         <Input
+          id="price-from"
           label="Цена от"
           type="number"
           placeholder="0"
@@ -185,6 +192,7 @@ export function AuctionFiltersWidget({ filters, onFiltersChange }: AuctionFilter
           onChange={(e) => update('price_from', e.target.value ? Number(e.target.value) : undefined)}
         />
         <Input
+          id="price-to"
           label="Цена до"
           type="number"
           placeholder="∞"

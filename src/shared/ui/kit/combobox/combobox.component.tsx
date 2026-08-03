@@ -7,6 +7,7 @@ interface ComboboxOption {
 }
 
 interface ComboboxProps {
+  id: string
   label?: string
   options: ComboboxOption[]
   value: string
@@ -24,6 +25,7 @@ export function Combobox({
   placeholder = 'Поиск...',
   error,
   className = '',
+  id,
 }: ComboboxProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [query, setQuery] = useState('')
@@ -100,8 +102,9 @@ export function Combobox({
 
   return (
     <div className={`flex flex-col gap-1 relative ${className}`} ref={containerRef}>
-      {label && <label className="text-sm font-medium text-gray-700">{label}</label>}
+      {label && <label className="text-sm font-medium text-gray-700" htmlFor={id}>{label}</label>}
       <input
+        id={id}
         ref={inputRef}
         type="text"
         value={isOpen ? query : selectedLabel}
