@@ -74,7 +74,7 @@ const mockAuction = {
     your: { bet: false, last_bet: null, last_bet_with_vat: null, win: false },
     settings: { prolong_after_bet: 5, winner_confirm: null, winner_counter_mode: null, transmission_time_in: null, coefficient: null },
   },
-  payment: { condition: null, condition_predefined: null, form: 'Безналичный', delay: null, delay_type: null, currency_code: '643', prepay: null },
+  payment: { condition: null, condition_predefined: null, form: 'Безналичный', delay: null, delay_type: null, currency_code: 643, prepay: null },
   assembly: { num: null, date: null },
   routes: [
     {

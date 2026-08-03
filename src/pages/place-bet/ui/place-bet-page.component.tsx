@@ -1,6 +1,7 @@
+import { useState, useEffect, useRef } from 'react'
 import { useParams, useNavigate, Link } from '@tanstack/react-router'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { useForm } from 'react-hook-form'
+import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod/v4'
 import { toast } from 'sonner'
@@ -12,12 +13,14 @@ import { Breadcrumbs } from '@/shared/ui/layout'
 import { Badge } from '@/shared/ui'
 import { formatCurrency, formatDate } from '@/widgets/auction-card/lib/formatters'
 import { getAuctionTypeBadge, getStatusBadge } from '@/widgets/auction-card/lib/badges'
-import { createPlaceBetSchema } from '@/features/place-bet/model/place-bet.schema'
+import { createPlaceBetSchema, getQuickBetValue, isQuickBetDisabled } from '@/features/place-bet/model/place-bet.schema'
 
 export function PlaceBetPage() {
   const { auctionUuid } = useParams({ from: '/auctions/$auctionUuid/place-bet' })
   const navigate = useNavigate()
   const queryClient = useQueryClient()
+  const [activePreset, setActivePreset] = useState<string | null>(null)
+  const presetClickRef = useRef(false)
 
   const { data: auction, isLoading } = useQuery({
     queryKey: auctionKeys.detail(auctionUuid),
@@ -57,12 +60,12 @@ export function PlaceBetPage() {
   type BetForm = z.infer<typeof schema>
 
   const {
-    register,
     handleSubmit,
     watch,
     setValue,
     setError,
-    formState: { errors },
+    reset,
+    control,
   } = useForm<BetForm>({
     resolver: zodResolver(schema),
     defaultValues: {
@@ -70,7 +73,24 @@ export function PlaceBetPage() {
     },
   })
 
+  useEffect(() => {
+    if (auction) {
+      const userBet = auction.trading.your.last_bet
+      if (userBet != null) {
+        reset({ price: userBet })
+      }
+    }
+  }, [auction, reset])
+
   const watchPrice = watch('price')
+
+  useEffect(() => {
+    if (presetClickRef.current) {
+      presetClickRef.current = false
+      return
+    }
+    setActivePreset(null)
+  }, [watchPrice])
 
   function onSubmit(data: BetForm) {
     mutation.mutate(data.price)
@@ -114,7 +134,7 @@ export function PlaceBetPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Form — 2 columns */}
         <div className="lg:col-span-2">
-          <form onSubmit={handleSubmit(onSubmit)} className="rounded-xl border border-gray-200 bg-white p-6">
+          <form onSubmit={handleSubmit(onSubmit)} noValidate className="rounded-xl border border-gray-200 bg-white p-6">
             {/* Auction summary */}
             <div className="mb-6 pb-6 border-b border-gray-200">
               <div className="flex items-center gap-2 mb-3">
@@ -131,17 +151,25 @@ export function PlaceBetPage() {
 
             {/* Price input */}
             <div className="mb-6">
-              <Input
-                label="Ваша ставка (₽)"
-                type="number"
-                step={step}
-                {...register('price', { valueAsNumber: true })}
-                error={errors.price?.message}
+              <Controller
+                name="price"
+                control={control}
+                render={({ field, fieldState }) => (
+                  <Input
+                    label="Ваша ставка (₽)"
+                    type="number"
+                    step={step}
+                    min={minPrice}
+                    {...field}
+                    value={field.value ?? ''}
+                    onChange={(e) => field.onChange(e.target.value === '' ? '' : Number(e.target.value))}
+                    error={fieldState.error?.message}
+                  />
+                )}
               />
               {watchPrice > 0 && (
                 <p className="mt-2 text-sm text-gray-500">
-                  Допустимый диапазон: {formatCurrency(minPrice)} — {formatCurrency(maxPrice)}
-                  {step > 0 && ` | Шаг: ${formatCurrency(step)}`}
+                  Допустимые ставки: от {formatCurrency(minPrice)} до {formatCurrency(maxPrice)}, кратно {formatCurrency(step)}
                 </p>
               )}
             </div>
@@ -151,37 +179,36 @@ export function PlaceBetPage() {
               <div className="mb-6">
                 <span className="text-sm font-medium text-gray-700 block mb-2">Быстрая ставка</span>
                 <div className="flex flex-wrap gap-2">
-                  {[
-                    { label: '90%', value: Math.floor(currentPrice * 0.9) },
-                    { label: '95%', value: Math.floor(currentPrice * 0.95) },
-                    { label: '100%', value: currentPrice },
-                    { label: 'Мин.', value: minPrice },
-                    { label: 'Макс.', value: maxPrice },
-                  ].map((preset) => {
-                    const disabled = preset.value < minPrice || preset.value > maxPrice
+                  {([
+                    ['90%', '90%'],
+                    ['95%', '95%'],
+                    ['100%', '100%'],
+                    ['Мин.', 'min'],
+                    ['Макс.', 'max'],
+                  ] as const).map(([label, preset]) => {
+                    const aligned = getQuickBetValue(preset, price!)
+                    const disabled = isQuickBetDisabled(preset, price!)
                     return (
                       <button
-                        key={preset.label}
+                        key={label}
                         type="button"
                         disabled={disabled}
                         onClick={() => {
-                          const clamped = Math.max(minPrice, Math.min(preset.value, maxPrice))
-                          const aligned = step > 0
-                            ? Math.ceil((clamped - minPrice) / step) * step + minPrice
-                            : clamped
-                          setValue('price', Math.min(aligned, maxPrice), { shouldValidate: true })
+                          presetClickRef.current = true
+                          setActivePreset(preset)
+                          setValue('price', aligned, { shouldValidate: true })
                         }}
                         className={`inline-flex items-center rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors ${
                           disabled
                             ? 'border-gray-100 bg-gray-50 text-gray-300 cursor-not-allowed'
-                            : watchPrice === preset.value
+                            : activePreset === preset
                               ? 'border-sky-500 bg-sky-50 text-sky-700'
                               : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50'
                         }`}
                       >
-                        {preset.label}
+                        {label}
                         <span className="ml-1 text-xs text-gray-400">
-                          {formatCurrency(preset.value)}
+                          {formatCurrency(aligned)}
                         </span>
                       </button>
                     )

@@ -182,7 +182,7 @@ export interface AuctionListItemTrading {
 
 export interface AuctionListItemPayment {
   form: string
-  currency_code: string
+  currency_code: number
   consignor: string
   consignee: string
 }
@@ -315,7 +315,7 @@ export interface AuctionShowPayment {
   form: string
   delay: number | null
   delay_type: PaymentDelayType | null
-  currency_code: string
+  currency_code: number
   prepay: string | null
 }
 

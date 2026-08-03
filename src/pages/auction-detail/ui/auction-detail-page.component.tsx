@@ -331,7 +331,7 @@ function Actions({ data, uuid }: { data: AuctionShowResponse; uuid: string }) {
   )
 }
 
-function InfoField({ label, value, highlight = false }: { label: string; value: string; highlight?: boolean }) {
+function InfoField({ label, value, highlight = false }: { label: string; value: string | number; highlight?: boolean }) {
   return (
     <div>
       <span className="text-gray-500 text-xs block">{label}</span>

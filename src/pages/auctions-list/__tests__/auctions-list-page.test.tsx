@@ -100,7 +100,7 @@ const mockAuctions = [
       red_bet_no_vat: false,
       is_last_bet_with_vat: false,
     },
-    payment: { form: 'Безналичный', currency_code: '643', consignor: '', consignee: '' },
+    payment: { form: 'Безналичный', currency_code: 643, consignor: '', consignee: '' },
   },
 ]
 
