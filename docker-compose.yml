@@ -2,13 +2,26 @@ services:
   frontend:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.prod
     container_name: cargo-auction
     ports:
       - "5173:5173"
+    environment:
+      - NODE_ENV=production
+    networks:
+      - cargo-auction-network
+
+  frontend-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: cargo-auction-dev
+    ports:
+      - "5173:5173"
     volumes:
-      - ./:/app
-      - /app/node_modules
+      - ./src:/app/src
+      - ./public:/app/public
+      - ./package*.json:/app/
     environment:
       - NODE_ENV=development
       - VITE_API_URL=http://localhost:5173/api

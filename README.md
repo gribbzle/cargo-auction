@@ -31,19 +31,37 @@ src/
 └── shared/       # API client, UI kit, utilities, types
 ```
 
+## Docker Setup
+
+### Images
+
+- **Dockerfile.prod** — production build (multi-stage, ~63MB, uses `serve`)
+- **Dockerfile.dev** — development (includes dev dependencies, hot reload via Vite)
+
+### Services (docker-compose.yml)
+
+- `frontend` — production image on port 5173
+- `frontend-dev` — development image with bind mounts (`./src`, `./public`) on port 5173
+
 ## Getting Started
 
 ### Prerequisites
 
 - Docker and Docker Compose
 
-### Run
+### Run with Docker (Recommended)
 
+**Development** (hot reload):
 ```bash
-docker compose up --build
+make dev
 ```
 
-The app will be available at `http://localhost:5173` with hot reload.
+**Production**:
+```bash
+make prod
+```
+
+The app will be available at `http://localhost:5173`.
 
 ### Without Docker
 
@@ -52,7 +70,24 @@ npm install
 npm run dev
 ```
 
-### Commands
+### Makefile Commands
+
+| Command | Description |
+|:---|:---|
+| `make dev` | Start development with hot reload |
+| `make prod` | Build and run production image |
+| `make build` | Build production Docker image (Dockerfile.prod) |
+| `make build-dev` | Build development Docker image (Dockerfile.dev) |
+| `make up` | Start all services |
+| `make down` | Stop all services |
+| `make logs` | View container logs |
+| `make test` | Run tests in container |
+| `make test-watch` | Run tests in watch mode |
+| `make lint` | Run linter in container |
+| `make typecheck` | TypeScript type checking in container |
+| `make clean` | Stop containers, remove images, prune system |
+
+### NPM Commands
 
 | Command | Description |
 |:---|:---|
