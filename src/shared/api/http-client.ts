@@ -17,12 +17,16 @@ export class ApiError extends Error {
 }
 
 export class ValidationError extends ApiError {
+  public errors: Array<{ field: string; message: string; code?: string }>
+
   constructor(
-    public errors: Array<{ field: string; message: string; code?: string }>,
+    errors: Array<{ field: string; message: string; code?: string }>,
+    message: string,
     traceId?: string | null,
   ) {
-    super(422, 'validation_failed', 'Validation failed', traceId)
+    super(422, 'validation_failed', message, traceId)
     this.name = 'ValidationError'
+    this.errors = errors
   }
 }
 
@@ -46,8 +50,21 @@ client.interceptors.response.use(
 )
 
 async function request<T>(config: AxiosRequestConfig): Promise<T> {
-  const response = await client.request<T>(config)
-  return response.data
+  try {
+    const response = await client.request<T>(config)
+    return response.data
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response?.status === 422) {
+      const body = error.response.data as Record<string, unknown>
+      const errors = body.errors as Array<{ field: string; message: string; code?: string }> | undefined
+      throw new ValidationError(
+        errors ?? [],
+        (body.message as string) ?? 'Validation failed',
+        (body.trace_id as string) ?? null,
+      )
+    }
+    throw error
+  }
 }
 
 export async function get<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
