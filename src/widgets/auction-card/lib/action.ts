@@ -17,9 +17,5 @@ export function getActionButton(
     return { label: 'Сделать ставку', href: `/auctions/${auctionUuid}/place-bet` }
   }
 
-  if (trading.is_bidder) {
-    return { label: 'Смотреть ставки', href: `/auctions/${auctionUuid}/bets` }
-  }
-
-  return { label: 'Недоступно', disabled: true }
+  return { label: 'Смотреть ставки', href: `/auctions/${auctionUuid}/bets` }
 }
