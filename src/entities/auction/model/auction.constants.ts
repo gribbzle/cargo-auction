@@ -65,3 +65,26 @@ export function getTradingStatusLabel(status: TradingStatus): string {
 export function getBidMeasurementLabel(type: BidMeasurementType): string {
   return BID_MEASUREMENT_LABELS[type] ?? BID_MEASUREMENT_LABELS.Unknown
 }
+
+export const CURRENCY_LABELS: Record<number, string> = {
+  643: 'Российский рубль (₽)',
+  840: 'Доллар США ($)',
+  978: 'Евро (€)',
+  398: 'Казахстанский тенге (₸)',
+  972: 'Белорусский рубль (Br)',
+  392: 'Японская иена (¥)',
+  156: 'Юань (¥)',
+  826: 'Фунт стерлингов (£)',
+  756: 'Швейцарский франк (CHF)',
+  710: 'Южноафриканский ранд (ZAR)',
+  784: 'Дирхам ОАЭ (AED)',
+  682: 'Саудовский риял (SAR)',
+  792: 'Турецкая лира (₺)',
+  410: 'Южнокорейская вона (₩)',
+  356: 'Индийская рупия (₹)',
+}
+
+export function getCurrencyLabel(code: number | null | undefined): string {
+  if (code == null) return '—'
+  return CURRENCY_LABELS[code] ?? `Код ${code}`
+}

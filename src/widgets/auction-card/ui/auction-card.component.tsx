@@ -1,5 +1,5 @@
 import { useCallback } from 'react'
-import { Link } from '@tanstack/react-router'
+import { Link, useNavigate } from '@tanstack/react-router'
 import type { AuctionListItem } from '@/shared/api/dto'
 import { Badge } from '@/shared/ui'
 import { usePrefetchAuction } from '@/features/prefetch-auction'
@@ -16,17 +16,31 @@ export function AuctionCard({ auction }: AuctionCardProps) {
   const { main, route, cargo, trading, organizer } = auction
   const action = getActionButton(trading, auction.uuid)
   const prefetchAuction = usePrefetchAuction()
+  const navigate = useNavigate()
 
   const handlePrefetch = useCallback(() => {
     prefetchAuction(auction.uuid)
   }, [prefetchAuction, auction.uuid])
 
+  const handleCardClick = useCallback(() => {
+    navigate({ to: '/auctions/$auctionUuid', params: { auctionUuid: auction.uuid } })
+  }, [navigate, auction.uuid])
+
   return (
     <article
-      className="rounded-xl border border-gray-200 bg-white p-5 hover:shadow-md transition-shadow"
+      className="rounded-xl border border-gray-200 bg-white p-5 hover:shadow-md transition-shadow cursor-pointer"
+      onClick={handleCardClick}
       onMouseEnter={handlePrefetch}
       onFocus={handlePrefetch}
       aria-label={`Аукцион ${main.cargo_num}`}
+      role="link"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault()
+          handleCardClick()
+        }
+      }}
     >
       {/* Header: cargo num + badges */}
       <div className="flex items-start justify-between gap-3 mb-3">
@@ -38,7 +52,9 @@ export function AuctionCard({ auction }: AuctionCardProps) {
             {trading.status_mobile}
           </Badge>
         </div>
-        <FavoriteButton auctionUuid={auction.uuid} isFavorite={trading.is_favorite} />
+        <div onClick={(e) => e.stopPropagation()}>
+          <FavoriteButton auctionUuid={auction.uuid} isFavorite={trading.is_favorite} />
+        </div>
       </div>
 
       {/* Route: load → unload */}
@@ -97,7 +113,7 @@ export function AuctionCard({ auction }: AuctionCardProps) {
       </div>
 
       {/* Action button */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between" onClick={(e) => e.stopPropagation()}>
         <span className="text-xs text-gray-500">{organizer.organization_name}</span>
         {action.disabled ? (
           <span

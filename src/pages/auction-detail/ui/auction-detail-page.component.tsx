@@ -7,6 +7,7 @@ import { Breadcrumbs } from '@/shared/ui/layout'
 import { FavoriteButton } from '@/features/favorite-toggle'
 import { formatCurrency, formatDate } from '@/widgets/auction-card/lib/formatters'
 import { getAuctionTypeBadge, getStatusBadge, getTradingStatusBadge } from '@/widgets/auction-card/lib/badges'
+import { getCurrencyLabel } from '@/entities/auction/model/auction.constants'
 import type { AuctionShowResponse, RoutePoint } from '@/shared/api/dto'
 
 export function AuctionDetailPage() {
@@ -290,7 +291,7 @@ function PaymentCard({ data }: { data: AuctionShowResponse }) {
       <h3 className="text-sm font-semibold text-gray-900 mb-3">Условия оплаты</h3>
       <div className="space-y-2 text-sm">
         <InfoField label="Форма оплаты" value={payment.form} />
-        <InfoField label="Валюта" value={payment.currency_code} />
+        <InfoField label="Валюта" value={getCurrencyLabel(payment.currency_code)} />
         {payment.delay != null && (
           <InfoField label="Отсрочка" value={`${payment.delay} ${payment.delay_type === 'CalendarDays' ? 'календарных дней' : 'рабочих дней'}`} />
         )}
