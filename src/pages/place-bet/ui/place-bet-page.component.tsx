@@ -163,10 +163,13 @@ export function PlaceBetPage() {
                     { label: '100%', value: currentPrice },
                     { label: 'Мин.', value: minPrice },
                     { label: 'Макс.', value: maxPrice },
-                  ].map((preset) => (
+                  ].map((preset) => {
+                    const disabled = preset.value < minPrice || preset.value > maxPrice
+                    return (
                       <button
                         key={preset.label}
                         type="button"
+                        disabled={disabled}
                         onClick={() => {
                           const clamped = Math.max(minPrice, Math.min(preset.value, maxPrice))
                           const aligned = step > 0
@@ -175,9 +178,11 @@ export function PlaceBetPage() {
                           setValue('price', Math.min(aligned, maxPrice), { shouldValidate: true })
                         }}
                         className={`inline-flex items-center rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors ${
-                          watchPrice === preset.value
-                            ? 'border-sky-500 bg-sky-50 text-sky-700'
-                            : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50'
+                          disabled
+                            ? 'border-gray-100 bg-gray-50 text-gray-300 cursor-not-allowed'
+                            : watchPrice === preset.value
+                              ? 'border-sky-500 bg-sky-50 text-sky-700'
+                              : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50'
                         }`}
                       >
                         {preset.label}
@@ -185,7 +190,8 @@ export function PlaceBetPage() {
                           {formatCurrency(preset.value)}
                         </span>
                       </button>
-                    ))}
+                    )
+                  })}
                 </div>
               </div>
             )}
