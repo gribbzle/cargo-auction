@@ -159,18 +159,18 @@ The application is a modern React frontend with TypeScript that allows users to 
 
 ## 3. Dependencies & Milestones (Updated)
 
-| Task | Priority | Estimated Time | Dependencies |
-| :--- | :--- | :--- | :--- |
-| Environment Setup & Docker | High | 1-2 days | None |
-| Core API Integration + MSW Store + Mock Cities | High | 3-4 days | Environment Setup |
-| State Management (TanStack Query + Zustand + Router) | High | 3-4 days | Core API Integration |
-| Auction Listing + **Full Filters + Prefetch** | High | 3-4 days | State Management |
-| **Place Bet Page (Separate Route)** | High | 2-3 days | Auction Listing, State Management |
-| Auction Detail + **DTO Flags + Bets Page (Full Fields)** | High | 4-5 days | Auction Listing |
-| Responsive Design & Accessibility | Medium | 2-3 days | All core features |
-| Testing (Unit + Integration + E2E) | High | 3-5 days | All features |
-| **AI_USAGE.md + README + Documentation** | High | 1-2 days | Testing |
-| Deployment & CI/CD | Medium | 2-3 days | Documentation |
+| Task | Priority | Dependencies |
+| :--- | :--- | :--- |
+| Environment Setup & Docker | High | None |
+| Core API Integration + MSW Store + Mock Cities | High | Environment Setup |
+| State Management (TanStack Query + Zustand + Router) | High | Core API Integration |
+| Auction Listing + **Full Filters + Prefetch** | High | State Management |
+| **Place Bet Page (Separate Route)** | High | Auction Listing, State Management |
+| Auction Detail + **DTO Flags + Bets Page (Full Fields)** | High | Auction Listing |
+| Responsive Design & Accessibility | Medium | All core features |
+| Testing (Unit + Integration + E2E) | High | All features |
+| **AI_USAGE.md + README + Documentation** | High | Testing |
+| Deployment & CI/CD | Medium | Documentation |
 
 ---
 
