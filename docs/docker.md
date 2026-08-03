@@ -4,28 +4,25 @@ This document defines the containerization strategy and the development environm
 
 ## 1. Environment Architecture
 
-We use a multi-container approach managed by **Docker Compose**. Even though the frontend is a client-side application, containerization allows us to manage the development server, mock servers, and potentially a local database or proxy in a unified way.
+We use a single-container approach managed by **Docker Compose**. The frontend is a client-side application, and containerization allows us to manage the development server in a unified way.
 
 ### Container Breakdown
 | Service | Image / Base | Role |
 | :--- | :--- | :--- |
 | **`frontend`** | `node:24-alpine` | Runs the Vite/React development server with Hot Module Replacement (HMR). |
-| **`msw-server`** | `node:24-alpine` | An optional standalone container to run **MSW** as a mock server if required for advanced integration testing. |
 
 ## 2. Docker Compose Configuration
 
 The `docker-compose.yml` file is the source of truth for the local development orchestration.
 
-### `docker-compose.yml` (Template)
+### `docker-compose.yml`
 ```yaml
-version: '3.8'
-
 services:
   frontend:
     build:
-      context:.
+      context: .
       dockerfile: Dockerfile
-    container_name: cargo-auction-app
+    container_name: cargo-auction
     ports:
       - "5173:5173"  # Vite default port
     volumes:
@@ -42,37 +39,29 @@ networks:
     driver: bridge
 ```
 
-## 3. Dockerfile Strategies
+## 3. Dockerfile Strategy
 
-### 3.1. Development (`Dockerfile.dev`)
+### Development (`Dockerfile`)
 Optimized for speed and developer experience.
-- Uses `node:20-alpine` for a small footprint.
+- Uses `node:24-alpine` for a small footprint.
 - Implements **Bind Mounts** for real-time code updates (HMR).
 - Sets `WORKDIR /app`.
-- Installs dependencies via `npm install` during build or via an entrypoint script.
+- Installs dependencies via `npm install` during build.
 
-### 3.2. Production (`Dockerfile.prod`)
-A multi-stage build to minimize the final image size and security surface area.
-1.  **Stage 1: Build** → Runs `npm run build` (generates static assets).
-2.  **Stage 2: Serve** → Uses **Nginx** to serve the static files from the `/dist` folder.
-
-**Example Production Flow:**
 ```dockerfile
-# Stage 1: Build
-FROM node:24-alpine AS build
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci
-COPY..
-RUN npm run build
+FROM node:24-alpine
 
-# Stage 2: Production
-FROM nginx:stable-alpine
-COPY --from=build /app/dist /usr/share/nginx/html
-# Copy custom nginx config for SPA routing (handles React Router fallback)
-COPY nginx.conf /etc/nginx/conf.d/default.conf 
-EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
+WORKDIR /app
+
+COPY package*.json ./
+
+RUN npm install
+
+COPY . .
+
+EXPOSE 5173
+
+CMD ["npm", "run", "dev", "--", "--host"]
 ```
 
 ## 4. Development Workflow with Docker
@@ -91,7 +80,7 @@ If a new package is added to `package.json`, the container needs to be rebuilt o
 docker-compose up --build
 
 # Option B: Run install inside the running container
-docker-compose exec frontend-dev npm install <package-name>
+docker-compose exec frontend npm install <package-name>
 ```
 
 ## 5. `.dockerignore`
