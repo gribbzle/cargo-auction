@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { searchCities } from '@/entities/city';
 import { Input, Select, Combobox, Button } from '@/shared/ui';
+import { useDebounce } from '@/shared/lib/use-debounce';
 import {
   type AuctionFilters,
   DEFAULT_FILTERS,
@@ -17,6 +18,15 @@ interface AuctionFiltersWidgetProps {
 export function AuctionFiltersWidget({ filters, onFiltersChange }: AuctionFiltersWidgetProps) {
   const [localFilters, setLocalFilters] = useState<AuctionFilters>(filters);
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  // Debounce cargo_num for auto-search
+  const debouncedCargoNum = useDebounce(localFilters.cargo_num ?? '', 300);
+
+  useEffect(() => {
+    if (debouncedCargoNum !== (filters.cargo_num ?? '')) {
+      onFiltersChange({ ...localFilters, cargo_num: debouncedCargoNum || undefined, page: 1 });
+    }
+  }, [debouncedCargoNum, filters.cargo_num, localFilters, onFiltersChange]);
 
   function update(key: keyof AuctionFilters, value: unknown) {
     setLocalFilters((prev) => ({ ...prev, [key]: value, page: 1 }));
