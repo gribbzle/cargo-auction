@@ -1,5 +1,6 @@
 import type { AuctionListItem, AuctionShowResponse, BetItem } from '@/shared/api/dto'
 import { CITIES_MOCK } from '@/entities/city/model/cities.mock'
+import { faker } from '@/shared/lib/faker'
 
 export interface AuctionSeed {
   uuid: string
@@ -61,27 +62,31 @@ function generateAuctionListItem(index: number): AuctionListItem {
     organizer: {
       subscriber_id: randomInt(1, 100),
       organization_id: randomInt(1, 50),
-      organization_name: `ООО "Организатор ${index + 1}"`,
+      organization_name: `ООО "${faker.company.name()}"`,
       organization_inn: `${randomInt(7700000000, 7799999999)}`,
       organization_kpp: `${randomInt(770001000, 770099999)}`,
       is_hide_organization: false,
     },
-    route: {
-      load: {
-        city: loadCity.name,
-        address: `ул. Тестовая, ${randomInt(1, 100)}`,
-        date: new Date(Date.now() + randomInt(1, 14) * 86400000).toISOString(),
-        city_gc_id: loadCity.gc_id,
-        points_count: 1,
-      },
-      unload: {
-        city: unloadCity.name,
-        address: `ул. Доставки, ${randomInt(1, 100)}`,
-        date: new Date(Date.now() + randomInt(3, 21) * 86400000).toISOString(),
-        city_gc_id: unloadCity.gc_id,
-        points_count: 1,
-      },
-    },
+    route: (() => {
+      const loadDate = new Date(Date.now() + randomInt(1, 14) * 86400000)
+      const unloadDate = new Date(loadDate.getTime() + randomInt(1, 7) * 86400000)
+      return {
+        load: {
+          city: loadCity.name,
+          address: `ул. Тестовая, ${randomInt(1, 100)}`,
+          date: loadDate.toISOString(),
+          city_gc_id: loadCity.gc_id,
+          points_count: 1,
+        },
+        unload: {
+          city: unloadCity.name,
+          address: `ул. Доставки, ${randomInt(1, 100)}`,
+          date: unloadDate.toISOString(),
+          city_gc_id: unloadCity.gc_id,
+          points_count: 1,
+        },
+      }
+    })(),
     cargo: {
       name: `Груз ${index + 1}`,
       weight: randomInt(1, 20),
@@ -254,18 +259,18 @@ function generateAuctionDetail(item: AuctionListItem): AuctionShowResponse {
         start_date: item.route.load.date,
         end_date: new Date(new Date(item.route.load.date).getTime() + 2 * 86400000).toISOString(),
         comment: null,
-        contractor: '',
-        contractor_inn: '',
+        contractor: faker.company.name(),
+        contractor_inn: faker.string.numeric(10),
         location: {
           city_name: item.route.load.city,
           city_full_name: item.route.load.city,
           city_gc_id: item.route.load.city_gc_id,
-          loading_address: item.route.load.address,
+          loading_address: `${faker.location.streetAddress()}`,
           lon: 0,
           lat: 0,
         },
         cargo: { name: '', package_name: '', weight: '', volume: '', length: '', width: '', height: '', oversized: false, package_amount: null },
-        contact: { name: '', phone: '' },
+        contact: { name: faker.person.fullName(), phone: faker.phone.number() },
       },
       {
         row_num: 2,
@@ -273,18 +278,18 @@ function generateAuctionDetail(item: AuctionListItem): AuctionShowResponse {
         start_date: item.route.unload.date,
         end_date: new Date(new Date(item.route.unload.date).getTime() + 2 * 86400000).toISOString(),
         comment: null,
-        contractor: '',
-        contractor_inn: '',
+        contractor: faker.company.name(),
+        contractor_inn: faker.string.numeric(10),
         location: {
           city_name: item.route.unload.city,
           city_full_name: item.route.unload.city,
           city_gc_id: item.route.unload.city_gc_id,
-          loading_address: item.route.unload.address,
+          loading_address: `${faker.location.streetAddress()}`,
           lon: 0,
           lat: 0,
         },
         cargo: { name: '', package_name: '', weight: '', volume: '', length: '', width: '', height: '', oversized: false, package_amount: null },
-        contact: { name: '', phone: '' },
+        contact: { name: faker.person.fullName(), phone: faker.phone.number() },
       },
     ],
     admitted_organizations: [],
@@ -298,13 +303,13 @@ function generateBets(auctionId: number, count: number, userBet?: { price_with_v
     created_at: new Date(Date.now() - randomInt(0, 48) * 3600000).toISOString(),
     auction_id: auctionId,
     subscriber_id: randomInt(1, 100),
-    contact_name: `Контакт ${i + 1}`,
+    contact_name: faker.person.fullName(),
     contact_phone: `+7 (${randomInt(900, 999)}) ${randomInt(100, 999)}-${randomInt(10, 99)}-${randomInt(10, 99)}`,
     price_with_vat: randomInt(50000, 500000),
     price_no_vat: randomInt(40000, 400000),
     organization_id: randomInt(1, 50),
     organization_inn: `${randomInt(7700000000, 7799999999)}`,
-    organization_name: `ООО "Перевозчик ${i + 1}"`,
+    organization_name: `ООО "${faker.company.name()}"`,
     transporter_comment: null,
     is_rejected: i === count - 1 && Math.random() > 0.7,
     is_counter: false,
