@@ -1,2 +1,2 @@
-export * from './kit'
-export { ErrorBoundary } from './error-boundary'
+export * from './kit';
+export { ErrorBoundary } from './error-boundary';

@@ -1,103 +1,116 @@
-import { useState, useEffect, useRef } from 'react'
-import { useParams, useNavigate, Link } from '@tanstack/react-router'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { useForm, Controller } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod/v4'
-import { toast } from 'sonner'
-import { auctionKeys } from '@/shared/lib/query-keys'
-import { fetchAuctionDetail, setBet } from '@/shared/api/auction-api'
-import { ValidationError } from '@/shared/api/http-client'
-import { Button, Input, Skeleton } from '@/shared/ui'
-import { Breadcrumbs } from '@/shared/ui/layout'
-import { Badge } from '@/shared/ui'
-import { formatCurrency, formatDate } from '@/widgets/auction-card/lib/formatters'
-import { getAuctionTypeBadge, getStatusBadge } from '@/widgets/auction-card/lib/badges'
-import { createPlaceBetSchema, getQuickBetValue, isQuickBetDisabled } from '@/features/place-bet/model/place-bet.schema'
+import { useState, useEffect, useRef } from 'react';
+import { useParams, useNavigate, Link } from '@tanstack/react-router';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod/v4';
+import { toast } from 'sonner';
+import { auctionKeys } from '@/shared/lib/query-keys';
+import { fetchAuctionDetail, setBet } from '@/shared/api/auction-api';
+import { ValidationError } from '@/shared/api/http-client';
+import { Button, Input, Skeleton } from '@/shared/ui';
+import { Breadcrumbs } from '@/shared/ui/layout';
+import { Badge } from '@/shared/ui';
+import { formatCurrency, formatDate } from '@/widgets/auction-card/lib/formatters';
+import { getAuctionTypeBadge, getStatusBadge } from '@/widgets/auction-card/lib/badges';
+import {
+  createPlaceBetSchema,
+  getQuickBetValue,
+  isQuickBetDisabled,
+} from '@/features/place-bet/model/place-bet.schema';
 
 export function PlaceBetPage() {
-  const { auctionUuid } = useParams({ from: '/auctions/$auctionUuid/place-bet' })
-  const navigate = useNavigate()
-  const queryClient = useQueryClient()
-  const [activePreset, setActivePreset] = useState<string | null>(null)
-  const presetClickRef = useRef(false)
+  const { auctionUuid } = useParams({ from: '/auctions/$auctionUuid/place-bet' });
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const [activePreset, setActivePreset] = useState<string | null>(null);
+  const presetClickRef = useRef(false);
 
   const { data: auction, isLoading } = useQuery({
     queryKey: auctionKeys.detail(auctionUuid),
     queryFn: () => fetchAuctionDetail(auctionUuid),
-  })
+  });
 
   const mutation = useMutation({
     mutationFn: (price: number) => setBet(auctionUuid, { price }),
     onSuccess: () => {
-      toast.success('Ставка сделана!')
-      queryClient.invalidateQueries({ queryKey: auctionKeys.detail(auctionUuid) })
-      queryClient.invalidateQueries({ queryKey: auctionKeys.bets(auctionUuid) })
-      navigate({ to: '/auctions/$auctionUuid', params: { auctionUuid } })
+      toast.success('Ставка сделана!');
+      queryClient.invalidateQueries({ queryKey: auctionKeys.detail(auctionUuid) });
+      queryClient.invalidateQueries({ queryKey: auctionKeys.bets(auctionUuid) });
+      navigate({ to: '/auctions/$auctionUuid', params: { auctionUuid } });
     },
     onError: (error: Error) => {
       if (error instanceof ValidationError) {
-        const fieldError = error.errors.find((e) => e.field === 'price')
+        const fieldError = error.errors.find((e) => e.field === 'price');
         if (fieldError) {
-          setError('price', { message: fieldError.message })
+          setError('price', { message: fieldError.message });
         } else {
-          toast.error(error.message)
+          toast.error(error.message);
         }
       } else {
-        toast.error('Произошла ошибка при отправке ставки')
+        toast.error('Произошла ошибка при отправке ставки');
       }
     },
-  })
+  });
 
-  const price = auction?.trading.price
-  const minPrice = price?.min ?? 0
-  const maxPrice = price?.max ?? Infinity
-  const step = price?.step ?? 1
-  const currentPrice = price?.current ?? 0
+  const price = auction?.trading.price;
+  const minPrice = price?.min ?? 0;
+  const maxPrice = price?.max ?? Infinity;
+  const step = price?.step ?? 1;
+  const currentPrice = price?.current ?? 0;
 
-  const schema = createPlaceBetSchema(price ?? { min: 0, max: Infinity, step: 1, current: 0, start: 0, current_no_vat: 0, min_no_vat: 0, max_no_vat: 0, start_no_vat: 0, available: 0, available_no_vat: 0, step_no_vat: 0, price_per_km: 0 })
+  const schema = createPlaceBetSchema(
+    price ?? {
+      min: 0,
+      max: Infinity,
+      step: 1,
+      current: 0,
+      start: 0,
+      current_no_vat: 0,
+      min_no_vat: 0,
+      max_no_vat: 0,
+      start_no_vat: 0,
+      available: 0,
+      available_no_vat: 0,
+      step_no_vat: 0,
+      price_per_km: 0,
+    }
+  );
 
-  type BetForm = z.infer<typeof schema>
+  type BetForm = z.infer<typeof schema>;
 
-  const {
-    handleSubmit,
-    watch,
-    setValue,
-    setError,
-    reset,
-    control,
-  } = useForm<BetForm>({
+  const { handleSubmit, watch, setValue, setError, reset, control } = useForm<BetForm>({
     resolver: zodResolver(schema),
     defaultValues: {
       price: minPrice || currentPrice,
     },
-  })
+  });
 
   useEffect(() => {
     if (auction) {
-      const userBet = auction.trading.your.last_bet
+      const userBet = auction.trading.your.last_bet;
       if (userBet != null) {
-        reset({ price: userBet })
+        reset({ price: userBet });
       }
     }
-  }, [auction, reset])
+  }, [auction, reset]);
 
-  const watchPrice = watch('price')
+  const watchPrice = watch('price');
 
   useEffect(() => {
     if (presetClickRef.current) {
-      presetClickRef.current = false
-      return
+      presetClickRef.current = false;
+      return;
     }
-    setActivePreset(null)
-  }, [watchPrice])
+    setActivePreset(null);
+  }, [watchPrice]);
 
   function onSubmit(data: BetForm) {
-    mutation.mutate(data.price)
+    mutation.mutate(data.price);
   }
 
   if (isLoading) {
-    return <PlaceBetSkeleton />
+    return <PlaceBetSkeleton />;
   }
 
   if (!auction) {
@@ -105,19 +118,23 @@ export function PlaceBetPage() {
       <div>
         <Breadcrumbs items={[{ label: 'Аукционы', to: '/auctions' }, { label: 'Ошибка' }]} />
         <div className="rounded-xl border border-red-200 bg-red-50 p-12 text-center" role="alert">
-          <div className="text-4xl mb-3" aria-hidden="true">⚠️</div>
+          <div className="text-4xl mb-3" aria-hidden="true">
+            ⚠️
+          </div>
           <p className="text-red-700 font-medium">Аукцион не найден</p>
           <Link to="/auctions">
-            <Button variant="secondary" className="mt-4">← Вернуться к списку</Button>
+            <Button variant="secondary" className="mt-4">
+              ← Вернуться к списку
+            </Button>
           </Link>
         </div>
       </div>
-    )
+    );
   }
 
-  const { main, routes, trading } = auction
-  const loadCity = routes[0]?.location.city_name ?? '—'
-  const unloadCity = routes[routes.length - 1]?.location.city_name ?? '—'
+  const { main, routes, trading } = auction;
+  const loadCity = routes[0]?.location.city_name ?? '—';
+  const unloadCity = routes[routes.length - 1]?.location.city_name ?? '—';
 
   return (
     <div>
@@ -134,7 +151,11 @@ export function PlaceBetPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Form — 2 columns */}
         <div className="lg:col-span-2">
-          <form onSubmit={handleSubmit(onSubmit)} noValidate className="rounded-xl border border-gray-200 bg-white p-6">
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            noValidate
+            className="rounded-xl border border-gray-200 bg-white p-6"
+          >
             {/* Auction summary */}
             <div className="mb-6 pb-6 border-b border-gray-200">
               <div className="flex items-center gap-2 mb-3">
@@ -163,14 +184,17 @@ export function PlaceBetPage() {
                     min={minPrice}
                     {...field}
                     value={field.value ?? ''}
-                    onChange={(e) => field.onChange(e.target.value === '' ? '' : Number(e.target.value))}
+                    onChange={(e) =>
+                      field.onChange(e.target.value === '' ? '' : Number(e.target.value))
+                    }
                     error={fieldState.error?.message}
                   />
                 )}
               />
               {watchPrice > 0 && (
                 <p className="mt-2 text-sm text-gray-500">
-                  Допустимые ставки: от {formatCurrency(minPrice)} до {formatCurrency(maxPrice)}, кратно {formatCurrency(step)}
+                  Допустимые ставки: от {formatCurrency(minPrice)} до {formatCurrency(maxPrice)},
+                  кратно {formatCurrency(step)}
                 </p>
               )}
             </div>
@@ -180,24 +204,26 @@ export function PlaceBetPage() {
               <div className="mb-6">
                 <span className="text-sm font-medium text-gray-700 block mb-2">Быстрая ставка</span>
                 <div className="flex flex-wrap gap-2">
-                  {([
-                    ['90%', '90%'],
-                    ['95%', '95%'],
-                    ['100%', '100%'],
-                    ['Мин.', 'min'],
-                    ['Макс.', 'max'],
-                  ] as const).map(([label, preset]) => {
-                    const aligned = getQuickBetValue(preset, price!)
-                    const disabled = isQuickBetDisabled(preset, price!)
+                  {(
+                    [
+                      ['90%', '90%'],
+                      ['95%', '95%'],
+                      ['100%', '100%'],
+                      ['Мин.', 'min'],
+                      ['Макс.', 'max'],
+                    ] as const
+                  ).map(([label, preset]) => {
+                    const aligned = getQuickBetValue(preset, price!);
+                    const disabled = isQuickBetDisabled(preset, price!);
                     return (
                       <button
                         key={label}
                         type="button"
                         disabled={disabled}
                         onClick={() => {
-                          presetClickRef.current = true
-                          setActivePreset(preset)
-                          setValue('price', aligned, { shouldValidate: true })
+                          presetClickRef.current = true;
+                          setActivePreset(preset);
+                          setValue('price', aligned, { shouldValidate: true });
                         }}
                         className={`inline-flex cursor-pointer items-center rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors ${
                           disabled
@@ -212,7 +238,7 @@ export function PlaceBetPage() {
                           {formatCurrency(aligned)}
                         </span>
                       </button>
-                    )
+                    );
                   })}
                 </div>
               </div>
@@ -224,7 +250,9 @@ export function PlaceBetPage() {
                 {mutation.isPending ? 'Отправка...' : 'Подтвердить ставку'}
               </Button>
               <Link to="/auctions/$auctionUuid" params={{ auctionUuid }}>
-                <Button type="button" variant="secondary">Отмена</Button>
+                <Button type="button" variant="secondary">
+                  Отмена
+                </Button>
               </Link>
             </div>
           </form>
@@ -278,7 +306,7 @@ export function PlaceBetPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 function PlaceBetSkeleton() {
@@ -302,5 +330,5 @@ function PlaceBetSkeleton() {
         </div>
       </div>
     </div>
-  )
+  );
 }

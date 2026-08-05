@@ -1,4 +1,4 @@
-import { z } from 'zod/v4'
+import { z } from 'zod/v4';
 
 export const auctionListSearchSchema = z.object({
   cargo_num: z.string().optional(),
@@ -14,6 +14,6 @@ export const auctionListSearchSchema = z.object({
   price_to: z.number().optional(),
   per_page: z.number().optional(),
   page: z.number().optional(),
-})
+});
 
-export type AuctionListSearch = z.infer<typeof auctionListSearchSchema>
+export type AuctionListSearch = z.infer<typeof auctionListSearchSchema>;

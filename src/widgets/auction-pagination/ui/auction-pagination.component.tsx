@@ -1,22 +1,22 @@
-import type { AuctionListMeta } from '@/shared/api/dto'
-import { Button } from '@/shared/ui'
+import type { AuctionListMeta } from '@/shared/api/dto';
+import { Button } from '@/shared/ui';
 
 interface AuctionPaginationProps {
-  meta: AuctionListMeta
-  onPageChange: (page: number) => void
+  meta: AuctionListMeta;
+  onPageChange: (page: number) => void;
 }
 
 export function AuctionPagination({ meta, onPageChange }: AuctionPaginationProps) {
-  const { current_page, last_page, total } = meta
+  const { current_page, last_page, total } = meta;
 
-  if (last_page <= 1) return null
+  if (last_page <= 1) return null;
 
-  const pages: (number | '...')[] = []
+  const pages: (number | '...')[] = [];
   for (let i = 1; i <= last_page; i++) {
     if (i === 1 || i === last_page || (i >= current_page - 1 && i <= current_page + 1)) {
-      pages.push(i)
+      pages.push(i);
     } else if (pages[pages.length - 1] !== '...') {
-      pages.push('...')
+      pages.push('...');
     }
   }
 
@@ -48,7 +48,7 @@ export function AuctionPagination({ meta, onPageChange }: AuctionPaginationProps
             >
               {p}
             </Button>
-          ),
+          )
         )}
         <Button
           variant="ghost"
@@ -60,5 +60,5 @@ export function AuctionPagination({ meta, onPageChange }: AuctionPaginationProps
         </Button>
       </div>
     </div>
-  )
+  );
 }

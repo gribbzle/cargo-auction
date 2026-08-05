@@ -1,8 +1,7 @@
 # Структура папок (FSD) — Полная версия с покрытием 100% ТЗ
 
-> **Примечание:** Все компоненты именуются как `*.component.tsx` (требование ТЗ).
-> Публичный API каждого слайса/сегмента экспортируется через `index.ts`.
-> MSW и Docker находятся **за пределами `src/`**.
+> **Примечание:** Все компоненты именуются как `*.component.tsx` (требование ТЗ). Публичный API каждого слайса/сегмента
+> экспортируется через `index.ts`. MSW и Docker находятся **за пределами `src/`**.
 
 ---
 
@@ -549,19 +548,19 @@ tests/
 
 ## Правила именования (ENFORCED)
 
-| Тип | Паттерн | Пример |
-|-----|---------|--------|
-| Компоненты | `*.component.tsx` | `auction-card.component.tsx` |
-| Хуки | `use-*.ts` | `use-auctions-list-query.ts` |
-| Утилиты | `*.ts` | `format-price.ts` |
-| Типы/Интерфейсы | `*.ts` | `auction-card-vm.ts` |
-| Константы/Энамы | `*.constants.ts` | `auction-type-labels.ts` |
-| Схемы Zod | `*.schema.ts` | `filters-schema.ts` |
-| Мапперы | `*.mapper.ts` | `auction-list.mapper.ts` |
-| API функции | `*.api.ts` | `auction-list.api.ts` |
-| Тесты | `*.test.ts` / `*.test.tsx` | `formatters.test.ts` |
-| Страницы | `*.page.tsx` (в pages/) | `auctions-list-page.component.tsx` |
-| Виджеты | `*.component.tsx` (в widgets/) | `auction-filters.component.tsx` |
+| Тип             | Паттерн                        | Пример                             |
+| --------------- | ------------------------------ | ---------------------------------- |
+| Компоненты      | `*.component.tsx`              | `auction-card.component.tsx`       |
+| Хуки            | `use-*.ts`                     | `use-auctions-list-query.ts`       |
+| Утилиты         | `*.ts`                         | `format-price.ts`                  |
+| Типы/Интерфейсы | `*.ts`                         | `auction-card-vm.ts`               |
+| Константы/Энамы | `*.constants.ts`               | `auction-type-labels.ts`           |
+| Схемы Zod       | `*.schema.ts`                  | `filters-schema.ts`                |
+| Мапперы         | `*.mapper.ts`                  | `auction-list.mapper.ts`           |
+| API функции     | `*.api.ts`                     | `auction-list.api.ts`              |
+| Тесты           | `*.test.ts` / `*.test.tsx`     | `formatters.test.ts`               |
+| Страницы        | `*.page.tsx` (в pages/)        | `auctions-list-page.component.tsx` |
+| Виджеты         | `*.component.tsx` (в widgets/) | `auction-filters.component.tsx`    |
 
 ---
 
@@ -602,23 +601,23 @@ shared
 
 ## Чек-лист покрытия ТЗ (по компонентам)
 
-| Требование ТЗ | Компонент / Файл | Статус |
-|---------------|------------------|--------|
-| Список аукционов с пагинацией | `pages/auctions-list`, `widgets/auction-pagination` | ✅ |
-| Фильтры: cargo_num, status, statuses, auc_type, load_city, unload_city, load_date_from/to, is_available, is_bidder, price_from/to | `widgets/auction-filters/ui/filter-fields/` (11 компонентов) | ✅ |
-| load_city / unload_city из мок-словаря | `entities/city/`, `city-selector-filter.component.tsx` | ✅ |
-| Карточка: 11 групп полей | `widgets/auction-card/ui/` (11 под-компонентов) | ✅ |
-| Детальная страница: DTO флаги (can_set_bet, hide_bets_history, hide_points_address_and_contacts, no_view_cargo_price) | `pages/auction-detail`, мапперы в `entities/auction/api/mappers/` | ✅ |
-| Страница ставок: 8 колонок (place, organization_name, price_with_vat, price_no_vat, is_win, is_rejected, cancel_reason, created_at) + empty + hidden | `widgets/auction-bets/ui/bets-table/` | ✅ |
-| Страница ставки (отдельная!): `/auctions/:uuid/place-bet` | `pages/place-bet/`, `widgets/place-bet-form/` | ✅ |
-| Форма ставки: min/max/step валидация + подсказки | `widgets/place-bet-form/ui/bid-input`, `bid-hints`, `place-bet-schemas.ts` | ✅ |
-| Prefetch по intent/hover | `features/prefetch-auction/` | ✅ |
-| MSW: mutable store, обновление trading state + bets | `mocks/store/auctions.store.ts`, `bets.store.ts` | ✅ |
-| Docker: `docker compose up --build`, hot reload | `docker-compose.yml`, `Dockerfile` | ✅ |
-| Именование компонентов: `*.component.tsx` | Во всей структуре | ✅ |
-| AI_USAGE.md | Корень проекта | ✅ |
-| README с отчётом | Корень проекта | ✅ |
-| Тесты: чистая логика + интеграционные | `tests/unit/`, `tests/integration/` | ✅ |
+| Требование ТЗ                                                                                                                                        | Компонент / Файл                                                           | Статус |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- | ------ |
+| Список аукционов с пагинацией                                                                                                                        | `pages/auctions-list`, `widgets/auction-pagination`                        | ✅     |
+| Фильтры: cargo_num, status, statuses, auc_type, load_city, unload_city, load_date_from/to, is_available, is_bidder, price_from/to                    | `widgets/auction-filters/ui/filter-fields/` (11 компонентов)               | ✅     |
+| load_city / unload_city из мок-словаря                                                                                                               | `entities/city/`, `city-selector-filter.component.tsx`                     | ✅     |
+| Карточка: 11 групп полей                                                                                                                             | `widgets/auction-card/ui/` (11 под-компонентов)                            | ✅     |
+| Детальная страница: DTO флаги (can_set_bet, hide_bets_history, hide_points_address_and_contacts, no_view_cargo_price)                                | `pages/auction-detail`, мапперы в `entities/auction/api/mappers/`          | ✅     |
+| Страница ставок: 8 колонок (place, organization_name, price_with_vat, price_no_vat, is_win, is_rejected, cancel_reason, created_at) + empty + hidden | `widgets/auction-bets/ui/bets-table/`                                      | ✅     |
+| Страница ставки (отдельная!): `/auctions/:uuid/place-bet`                                                                                            | `pages/place-bet/`, `widgets/place-bet-form/`                              | ✅     |
+| Форма ставки: min/max/step валидация + подсказки                                                                                                     | `widgets/place-bet-form/ui/bid-input`, `bid-hints`, `place-bet-schemas.ts` | ✅     |
+| Prefetch по intent/hover                                                                                                                             | `features/prefetch-auction/`                                               | ✅     |
+| MSW: mutable store, обновление trading state + bets                                                                                                  | `mocks/store/auctions.store.ts`, `bets.store.ts`                           | ✅     |
+| Docker: `docker compose up --build`, hot reload                                                                                                      | `docker-compose.yml`, `Dockerfile`                                         | ✅     |
+| Именование компонентов: `*.component.tsx`                                                                                                            | Во всей структуре                                                          | ✅     |
+| AI_USAGE.md                                                                                                                                          | Корень проекта                                                             | ✅     |
+| README с отчётом                                                                                                                                     | Корень проекта                                                             | ✅     |
+| Тесты: чистая логика + интеграционные                                                                                                                | `tests/unit/`, `tests/integration/`                                        | ✅     |
 
 ---
 
@@ -634,5 +633,5 @@ shared
 
 ---
 
-*Версия: 2.0 — Полное покрытие Тестового Задания*  
-*Дата обновления: после анализа соответствия ТЗ*
+_Версия: 2.0 — Полное покрытие Тестового Задания_  
+_Дата обновления: после анализа соответствия ТЗ_

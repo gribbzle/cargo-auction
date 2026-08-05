@@ -1,6 +1,6 @@
-export { Badge } from './badge'
-export { Button } from './button'
-export { Combobox } from './combobox'
-export { Input } from './input'
-export { Select } from './select'
-export { Skeleton } from './skeleton'
+export { Badge } from './badge';
+export { Button } from './button';
+export { Combobox } from './combobox';
+export { Input } from './input';
+export { Select } from './select';
+export { Skeleton } from './skeleton';

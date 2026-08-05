@@ -1,12 +1,12 @@
-import { type ButtonHTMLAttributes, type ReactNode } from 'react'
+import { type ButtonHTMLAttributes, type ReactNode } from 'react';
 
-type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger'
-type ButtonSize = 'sm' | 'md' | 'lg'
+type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger';
+type ButtonSize = 'sm' | 'md' | 'lg';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  children: ReactNode
-  variant?: ButtonVariant
-  size?: ButtonSize
+  children: ReactNode;
+  variant?: ButtonVariant;
+  size?: ButtonSize;
 }
 
 const variantClasses: Record<ButtonVariant, string> = {
@@ -14,13 +14,13 @@ const variantClasses: Record<ButtonVariant, string> = {
   secondary: 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 active:bg-gray-100',
   ghost: 'text-gray-600 hover:bg-gray-100 active:bg-gray-200',
   danger: 'bg-red-600 text-white hover:bg-red-700 active:bg-red-800',
-}
+};
 
 const sizeClasses: Record<ButtonSize, string> = {
   sm: 'px-3 py-1.5 text-sm',
   md: 'px-4 py-2 text-sm',
   lg: 'px-6 py-3 text-base',
-}
+};
 
 export function Button({
   children,
@@ -38,5 +38,5 @@ export function Button({
     >
       {children}
     </button>
-  )
+  );
 }

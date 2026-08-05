@@ -1,81 +1,76 @@
-import type {
-  AuctionShowResponse,
-  AuctionListItem,
-  BetItem,
-  RoutePoint,
-} from '@/shared/api/dto'
+import type { AuctionShowResponse, AuctionListItem, BetItem, RoutePoint } from '@/shared/api/dto';
 
 export interface AuctionRouteSummary {
-  loadCity: string
-  unloadCity: string
-  loadDate: string
-  unloadDate: string
+  loadCity: string;
+  unloadCity: string;
+  loadDate: string;
+  unloadDate: string;
 }
 
 export interface AuctionPriceSummary {
-  current: number | null
-  start: number | null
-  step: number | null
-  min: number | null
-  max: number | null
-  pricePerKm: number
+  current: number | null;
+  start: number | null;
+  step: number | null;
+  min: number | null;
+  max: number | null;
+  pricePerKm: number;
 }
 
 export interface AuctionCargoSummary {
-  name: string
-  bodyType: string
-  weight: number
-  volume: number
-  truckCount: number
-  isInternational: boolean
+  name: string;
+  bodyType: string;
+  weight: number;
+  volume: number;
+  truckCount: number;
+  isInternational: boolean;
 }
 
 export interface AuctionDetailSummary {
-  uuid: string
-  cargoNum: string
-  aucType: string
-  status: string
-  tradingStatus: string
-  route: AuctionRouteSummary
-  price: AuctionPriceSummary
-  cargo: AuctionCargoSummary
-  canSetBet: boolean
-  isFavorite: boolean
-  hasMyBet: boolean
+  uuid: string;
+  cargoNum: string;
+  aucType: string;
+  status: string;
+  tradingStatus: string;
+  route: AuctionRouteSummary;
+  price: AuctionPriceSummary;
+  cargo: AuctionCargoSummary;
+  canSetBet: boolean;
+  isFavorite: boolean;
+  hasMyBet: boolean;
 }
 
 export interface BetSummary {
-  id: number
-  organizationName: string
-  organizationInn: string
-  contactName: string
-  contactPhone: string
-  priceWithVat: number
-  priceNoVat: number
-  place: number | null
-  isWinner: boolean
-  isRejected: boolean
-  cancelReason: string
-  createdAt: string
+  id: number;
+  organizationName: string;
+  organizationInn: string;
+  contactName: string;
+  contactPhone: string;
+  priceWithVat: number;
+  priceNoVat: number;
+  place: number | null;
+  isWinner: boolean;
+  isRejected: boolean;
+  cancelReason: string;
+  createdAt: string;
 }
 
 export function mapRouteSummary(routes: RoutePoint[]): AuctionRouteSummary {
-  const first = routes[0]
-  const last = routes[routes.length - 1] ?? first
+  const first = routes[0];
+  const last = routes[routes.length - 1] ?? first;
 
   return {
     loadCity: first?.location.city_name ?? '—',
     unloadCity: last?.location.city_name ?? '—',
     loadDate: first?.start_date ?? '',
     unloadDate: last?.end_date ?? '',
-  }
+  };
 }
 
 export function mapAuctionDetailSummary(
   auction: AuctionShowResponse,
-  uuid: string,
+  uuid: string
 ): AuctionDetailSummary {
-  const route = mapRouteSummary(auction.routes)
+  const route = mapRouteSummary(auction.routes);
 
   return {
     uuid,
@@ -103,7 +98,7 @@ export function mapAuctionDetailSummary(
     canSetBet: auction.trading.can_set_bet,
     isFavorite: auction.trading.is_favorite,
     hasMyBet: auction.trading.your.bet,
-  }
+  };
 }
 
 export function mapListItemSummary(item: AuctionListItem) {
@@ -119,7 +114,7 @@ export function mapListItemSummary(item: AuctionListItem) {
     canSetBet: item.trading.can_set_bet,
     hasMyBet: item.trading.your?.bet ?? false,
     isFavorite: item.trading.is_favorite,
-  }
+  };
 }
 
 export function mapBetSummary(bet: BetItem): BetSummary {
@@ -136,5 +131,5 @@ export function mapBetSummary(bet: BetItem): BetSummary {
     isRejected: bet.is_rejected,
     cancelReason: bet.cancel_reason,
     createdAt: bet.created_at,
-  }
+  };
 }

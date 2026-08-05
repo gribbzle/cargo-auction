@@ -1,30 +1,30 @@
-import { useCallback } from 'react'
-import { Link, useNavigate } from '@tanstack/react-router'
-import type { AuctionListItem } from '@/shared/api/dto'
-import { Badge } from '@/shared/ui'
-import { usePrefetchAuction } from '@/features/prefetch-auction'
-import { FavoriteButton } from '@/features/favorite-toggle'
-import { formatCurrency, formatWeight, formatVolume, formatDate } from '../lib/formatters'
-import { getAuctionTypeBadge, getStatusBadge, getTradingStatusBadge } from '../lib/badges'
-import { getActionButton } from '../lib/action'
+import { useCallback } from 'react';
+import { Link, useNavigate } from '@tanstack/react-router';
+import type { AuctionListItem } from '@/shared/api/dto';
+import { Badge } from '@/shared/ui';
+import { usePrefetchAuction } from '@/features/prefetch-auction';
+import { FavoriteButton } from '@/features/favorite-toggle';
+import { formatCurrency, formatWeight, formatVolume, formatDate } from '../lib/formatters';
+import { getAuctionTypeBadge, getStatusBadge, getTradingStatusBadge } from '../lib/badges';
+import { getActionButton } from '../lib/action';
 
 interface AuctionCardProps {
-  auction: AuctionListItem
+  auction: AuctionListItem;
 }
 
 export function AuctionCard({ auction }: AuctionCardProps) {
-  const { main, route, cargo, trading, organizer } = auction
-  const action = getActionButton(trading, auction.uuid)
-  const prefetchAuction = usePrefetchAuction()
-  const navigate = useNavigate()
+  const { main, route, cargo, trading, organizer } = auction;
+  const action = getActionButton(trading, auction.uuid);
+  const prefetchAuction = usePrefetchAuction();
+  const navigate = useNavigate();
 
   const handlePrefetch = useCallback(() => {
-    prefetchAuction(auction.uuid)
-  }, [prefetchAuction, auction.uuid])
+    prefetchAuction(auction.uuid);
+  }, [prefetchAuction, auction.uuid]);
 
   const handleCardClick = useCallback(() => {
-    navigate({ to: '/auctions/$auctionUuid', params: { auctionUuid: auction.uuid } })
-  }, [navigate, auction.uuid])
+    navigate({ to: '/auctions/$auctionUuid', params: { auctionUuid: auction.uuid } });
+  }, [navigate, auction.uuid]);
 
   return (
     <article
@@ -37,8 +37,8 @@ export function AuctionCard({ auction }: AuctionCardProps) {
       tabIndex={0}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault()
-          handleCardClick()
+          e.preventDefault();
+          handleCardClick();
         }
       }}
     >
@@ -133,5 +133,5 @@ export function AuctionCard({ auction }: AuctionCardProps) {
         ) : null}
       </div>
     </article>
-  )
+  );
 }

@@ -1,4 +1,4 @@
-import type { AuctionListRequest } from '../api/dto'
+import type { AuctionListRequest } from '../api/dto';
 
 export const auctionKeys = {
   all: ['auctions'] as const,
@@ -8,4 +8,4 @@ export const auctionKeys = {
   detail: (uuid: string) => [...auctionKeys.details(), uuid] as const,
   bets: (uuid: string) => [...auctionKeys.all, 'bets', uuid] as const,
   tradingPrice: (uuid: string) => [...auctionKeys.all, 'trading-price', uuid] as const,
-}
+};

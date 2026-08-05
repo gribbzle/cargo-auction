@@ -1,1 +1,1 @@
-export { AuctionPagination } from './auction-pagination.component'
+export { AuctionPagination } from './auction-pagination.component';

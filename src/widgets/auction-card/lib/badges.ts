@@ -1,4 +1,4 @@
-import type { AuctionType, AuctionStatus, TradingStatus } from '@/shared/api/dto'
+import type { AuctionType, AuctionStatus, TradingStatus } from '@/shared/api/dto';
 
 export function getAuctionTypeBadge(type: AuctionType) {
   const map: Record<AuctionType, 'info' | 'purple' | 'warning' | 'success' | 'default'> = {
@@ -7,12 +7,15 @@ export function getAuctionTypeBadge(type: AuctionType) {
     Down: 'warning',
     FixPrice: 'success',
     Unknown: 'default',
-  }
-  return map[type]
+  };
+  return map[type];
 }
 
 export function getStatusBadge(status: AuctionStatus) {
-  const map: Record<AuctionStatus, 'info' | 'success' | 'warning' | 'error' | 'default' | 'purple'> = {
+  const map: Record<
+    AuctionStatus,
+    'info' | 'success' | 'warning' | 'error' | 'default' | 'purple'
+  > = {
     Planning: 'default',
     Auction: 'info',
     DeterminateWinner: 'purple',
@@ -22,12 +25,15 @@ export function getStatusBadge(status: AuctionStatus) {
     Stopped: 'error',
     Canceled: 'error',
     Unknown: 'default',
-  }
-  return map[status]
+  };
+  return map[status];
 }
 
 export function getTradingStatusBadge(status: TradingStatus) {
-  const map: Record<TradingStatus, 'success' | 'warning' | 'error' | 'info' | 'default' | 'purple'> = {
+  const map: Record<
+    TradingStatus,
+    'success' | 'warning' | 'error' | 'info' | 'default' | 'purple'
+  > = {
     NotParticipating: 'default',
     Leading: 'success',
     Losing: 'warning',
@@ -37,6 +43,6 @@ export function getTradingStatusBadge(status: TradingStatus) {
     Winner: 'success',
     Accepted: 'success',
     Unknown: 'default',
-  }
-  return map[status]
+  };
+  return map[status];
 }

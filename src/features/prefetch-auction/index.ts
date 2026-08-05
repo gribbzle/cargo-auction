@@ -1,1 +1,1 @@
-export { usePrefetchAuction } from './use-prefetch-auction'
+export { usePrefetchAuction } from './use-prefetch-auction';

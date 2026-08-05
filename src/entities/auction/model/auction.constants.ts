@@ -1,4 +1,9 @@
-import type { AuctionType, AuctionStatus, TradingStatus, BidMeasurementType } from '@/shared/api/dto'
+import type {
+  AuctionType,
+  AuctionStatus,
+  TradingStatus,
+  BidMeasurementType,
+} from '@/shared/api/dto';
 
 export const AUCTION_TYPE_LABELS: Record<AuctionType, string> = {
   Request: 'Заявка',
@@ -6,7 +11,7 @@ export const AUCTION_TYPE_LABELS: Record<AuctionType, string> = {
   Down: 'Понижение',
   FixPrice: 'Фикс. цена',
   Unknown: 'Неизвестно',
-}
+};
 
 export const AUCTION_STATUS_LABELS: Record<AuctionStatus, string> = {
   Planning: 'Планирование',
@@ -18,7 +23,7 @@ export const AUCTION_STATUS_LABELS: Record<AuctionStatus, string> = {
   Stopped: 'Остановлен',
   Canceled: 'Отменён',
   Unknown: 'Неизвестно',
-}
+};
 
 export const TRADING_STATUS_LABELS: Record<TradingStatus, string> = {
   NotParticipating: 'Не участвую',
@@ -30,15 +35,18 @@ export const TRADING_STATUS_LABELS: Record<TradingStatus, string> = {
   Winner: 'Победитель',
   Accepted: 'Принято',
   Unknown: 'Неизвестно',
-}
+};
 
 export const BID_MEASUREMENT_LABELS: Record<BidMeasurementType, string> = {
   PerRoute: 'За маршрут',
   PerKm: 'За км',
   Unknown: '—',
-}
+};
 
-export const TRADING_STATUS_COLORS: Record<TradingStatus, 'success' | 'warning' | 'error' | 'info' | 'default' | 'purple'> = {
+export const TRADING_STATUS_COLORS: Record<
+  TradingStatus,
+  'success' | 'warning' | 'error' | 'info' | 'default' | 'purple'
+> = {
   NotParticipating: 'default',
   Leading: 'success',
   Losing: 'warning',
@@ -48,22 +56,22 @@ export const TRADING_STATUS_COLORS: Record<TradingStatus, 'success' | 'warning' 
   Winner: 'success',
   Accepted: 'success',
   Unknown: 'default',
-}
+};
 
 export function getAuctionTypeLabel(type: AuctionType): string {
-  return AUCTION_TYPE_LABELS[type] ?? AUCTION_TYPE_LABELS.Unknown
+  return AUCTION_TYPE_LABELS[type] ?? AUCTION_TYPE_LABELS.Unknown;
 }
 
 export function getAuctionStatusLabel(status: AuctionStatus): string {
-  return AUCTION_STATUS_LABELS[status] ?? AUCTION_STATUS_LABELS.Unknown
+  return AUCTION_STATUS_LABELS[status] ?? AUCTION_STATUS_LABELS.Unknown;
 }
 
 export function getTradingStatusLabel(status: TradingStatus): string {
-  return TRADING_STATUS_LABELS[status] ?? TRADING_STATUS_LABELS.Unknown
+  return TRADING_STATUS_LABELS[status] ?? TRADING_STATUS_LABELS.Unknown;
 }
 
 export function getBidMeasurementLabel(type: BidMeasurementType): string {
-  return BID_MEASUREMENT_LABELS[type] ?? BID_MEASUREMENT_LABELS.Unknown
+  return BID_MEASUREMENT_LABELS[type] ?? BID_MEASUREMENT_LABELS.Unknown;
 }
 
 export const CURRENCY_LABELS: Record<number, string> = {
@@ -82,9 +90,9 @@ export const CURRENCY_LABELS: Record<number, string> = {
   792: 'Турецкая лира (₺)',
   410: 'Южнокорейская вона (₩)',
   356: 'Индийская рупия (₹)',
-}
+};
 
 export function getCurrencyLabel(code: number | null | undefined): string {
-  if (code == null) return '—'
-  return CURRENCY_LABELS[code] ?? `Код ${code}`
+  if (code == null) return '—';
+  return CURRENCY_LABELS[code] ?? `Код ${code}`;
 }

@@ -1,12 +1,12 @@
-import { Link } from '@tanstack/react-router'
+import { Link } from '@tanstack/react-router';
 
 interface BreadcrumbItem {
-  label: string
-  to?: string
+  label: string;
+  to?: string;
 }
 
 interface BreadcrumbsProps {
-  items: BreadcrumbItem[]
+  items: BreadcrumbItem[];
 }
 
 export function Breadcrumbs({ items }: BreadcrumbsProps) {
@@ -27,5 +27,5 @@ export function Breadcrumbs({ items }: BreadcrumbsProps) {
         ))}
       </ol>
     </nav>
-  )
+  );
 }

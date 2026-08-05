@@ -1,1 +1,1 @@
-export { Skeleton } from './skeleton.component'
+export { Skeleton } from './skeleton.component';

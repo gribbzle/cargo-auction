@@ -1,1 +1,1 @@
-export { AuctionFiltersWidget } from './ui/auction-filters.component'
+export { AuctionFiltersWidget } from './ui/auction-filters.component';

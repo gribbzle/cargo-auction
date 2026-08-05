@@ -1,1 +1,1 @@
-export { Combobox } from './combobox.component'
+export { Combobox } from './combobox.component';

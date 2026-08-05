@@ -1,8 +1,8 @@
 export interface City {
-  id: number
-  gc_id: number
-  name: string
-  region?: string
+  id: number;
+  gc_id: number;
+  name: string;
+  region?: string;
 }
 
 export const CITIES_MOCK: City[] = [
@@ -56,22 +56,20 @@ export const CITIES_MOCK: City[] = [
   { id: 48, gc_id: 48, name: 'Ярославль', region: 'Ярославская область' },
   { id: 49, gc_id: 49, name: 'Чита', region: 'Забайкальский край' },
   { id: 50, gc_id: 50, name: 'Ульяновск', region: 'Ульяновская область' },
-]
+];
 
 export function searchCities(query: string): City[] {
-  if (!query.trim()) return CITIES_MOCK
-  const lower = query.toLowerCase()
+  if (!query.trim()) return CITIES_MOCK;
+  const lower = query.toLowerCase();
   return CITIES_MOCK.filter(
-    (city) =>
-      city.name.toLowerCase().includes(lower) ||
-      city.region?.toLowerCase().includes(lower),
-  )
+    (city) => city.name.toLowerCase().includes(lower) || city.region?.toLowerCase().includes(lower)
+  );
 }
 
 export function getCityByGcId(gcId: number): City | undefined {
-  return CITIES_MOCK.find((city) => city.gc_id === gcId)
+  return CITIES_MOCK.find((city) => city.gc_id === gcId);
 }
 
 export function getCityByName(name: string): City | undefined {
-  return CITIES_MOCK.find((city) => city.name === name)
+  return CITIES_MOCK.find((city) => city.name === name);
 }

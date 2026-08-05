@@ -1,18 +1,31 @@
 # Development Plan
 
-This document outlines the final step-by-step implementation plan for the auction platform, taking into account all previous analysis documents (phase-0-analysis.md, api-analysis.md, architecture.md, folder-structure.md, state-management.md, user-flows.md, component-inventory.md, ui-guidelines.md, docker.md) **and the compliance analysis against the test assignment requirements**.
+This document outlines the final step-by-step implementation plan for the auction platform, taking into account all
+previous analysis documents (phase-0-analysis.md, api-analysis.md, architecture.md, folder-structure.md,
+state-management.md, user-flows.md, component-inventory.md, ui-guidelines.md, docker.md) **and the compliance analysis
+against the test assignment requirements**.
 
 ## 1. Project Overview
-The application is a modern React frontend with TypeScript that allows users to browse, search, and bid on auctions. It follows the Feature Sliced Design (FSD) methodology, uses TanStack Query for data fetching, Zustand for UI state management, and follows strict coding standards.
 
-**Примечание по Docker:** Docker не упомянут в тестовом задании — это самостоятельное решение кандидата. ТЗ требует лишь "запускается локально". Docker обеспечивает воспроизводимое окружение и удобный onboarding, что будет задокументировано в README.
+The application is a modern React frontend with TypeScript that allows users to browse, search, and bid on auctions. It
+follows the Feature Sliced Design (FSD) methodology, uses TanStack Query for data fetching, Zustand for UI state
+management, and follows strict coding standards.
+
+**Примечание по Docker:** Docker не упомянут в тестовом задании — это самостоятельное решение кандидата. ТЗ требует лишь
+"запускается локально". Docker обеспечивает воспроизводимое окружение и удобный onboarding, что будет задокументировано
+в README.
 
 **⚠️ CRITICAL COMPLIANCE NOTES FROM TEST ASSIGNMENT ANALYSIS:**
+
 - **Place Bet MUST be a separate page at `/auctions/:auctionUuid/place-bet`** (not a modal/tab on detail page)
-- **Mandatory filters missing**: `cargo_num`, `is_available`, `is_bidder`, `auc_type`, city selectors for `load_city`/`unload_city`
-- **Auction Card missing fields**: auction type badge, trading status, route, dates, cargo details, price per km, bid step, "my bet" flag, correct primary actions
-- **Detail Page DTO flags**: must respect `can_set_bet`, `hide_bets_history`, `hide_points_address_and_contacts`, `no_view_cargo_price`
-- **Bets Page missing fields**: price with/without VAT, carrier, rank, winner flag, cancelled flag, cancel reason, empty state, hidden history state
+- **Mandatory filters missing**: `cargo_num`, `is_available`, `is_bidder`, `auc_type`, city selectors for
+  `load_city`/`unload_city`
+- **Auction Card missing fields**: auction type badge, trading status, route, dates, cargo details, price per km, bid
+  step, "my bet" flag, correct primary actions
+- **Detail Page DTO flags**: must respect `can_set_bet`, `hide_bets_history`, `hide_points_address_and_contacts`,
+  `no_view_cargo_price`
+- **Bets Page missing fields**: price with/without VAT, carrier, rank, winner flag, cancelled flag, cancel reason, empty
+  state, hidden history state
 - **Place Bet Form**: must validate against `min`/`max`/`step` from detail DTO, show hints for available price and step
 - **Mock Cities Dictionary**: required for `load_city`/`unload_city` selectors
 - **AI_USAGE.md**: mandatory deliverable documenting AI usage, decisions, risks, improvements
@@ -21,16 +34,18 @@ The application is a modern React frontend with TypeScript that allows users to 
 
 ## 2. Implementation Phases
 
-### Phase 1: Environment Setup & Project Initialization (1-2 days)
+### Phase 1: Environment Setup & Project Initialization
+
 - Set up development environment with Docker Compose
-- Configure Node.js version (20.x) and package manager (npm)
+- Configure Node.js version (24.x) and package manager (npm)
 - Initialize project structure with FSD methodology
-- Set up ESLint, Prettier, and TypeScript configuration
+- Set up Oxlint, Prettier, and TypeScript configuration
 - Configure Git repository with Conventional Commits and branch strategy
 - Create initial Dockerfiles and docker-compose.yml
 - **Verify: `docker compose up --build` works with hot reload and source mounting**
 
-### Phase 2: Core Architecture & State Management (3-4 days)
+### Phase 2: Core Architecture & State Management
+
 - Implement API client with Axios and interceptors
   - Response-interceptor: 401 → toast "Сессия истекла" (страницы логина нет, MSW всегда авторизован)
   - Response-interceptor: 503 → retry logic (2 попытки, exponential backoff)
@@ -42,7 +57,8 @@ The application is a modern React frontend with TypeScript that allows users to 
   - **Mock Cities Dictionary** (`/mocks/data/cities.ts`) for `load_city`/`unload_city` selectors
   - **Auction store structure**: `auctions[uuid].trading.{status_mobile, your, price}`, `bets[uuid][]`
 
-### Phase 3: Core Features — Auction Listing (3-4 days)
+### Phase 3: Core Features — Auction Listing
+
 - **AuctionCard Component** (widgets/auction-card) — **ALL mandatory fields from test assignment:**
   - Номер заявки
   - Тип аукциона: Request / Up / Down / FixPrice (badge)
@@ -69,18 +85,22 @@ The application is a modern React frontend with TypeScript that allows users to 
 - URL state synchronization for all filters (TanStack Router + Zod search params validation with safe fallbacks)
 - Prefetch auction detail on card hover/intent (features/prefetch-auction)
 
-### Phase 3.5: Core Features — Place Bet Page (Separate Route) (2-3 days)
+### Phase 3.5: Core Features — Place Bet Page (Separate Route)
+
 **⚠️ CRITICAL: This is a SEPARATE PAGE at `/auctions/:auctionUuid/place-bet`, NOT a modal on detail page**
+
 - **Page**: `pages/place-bet/`
 - **PlaceBidForm Feature** (features/place-bet):
   - React Hook Form + Zod validation
-  - **Dynamic schema factory**: `createPlaceBetSchema(tradingPrice)` using `min`, `max`, `step` from `AuctionShowTradingPrice`
+  - **Dynamic schema factory**: `createPlaceBetSchema(tradingPrice)` using `min`, `max`, `step` from
+    `AuctionShowTradingPrice`
   - **Hints**: show available price, bid step, min/max boundaries
   - Client-side validation + server-side 422 error mapping to form fields
   - On success: invalidate auction detail + bets list queries, redirect back to detail
 - **Prefetch**: detail page data prefetched on hover of "Place Bid" button on card/detail
 
-### Phase 4: Core Features — Auction Detail & Bets (4-5 days)
+### Phase 4: Core Features — Auction Detail & Bets
+
 - **AuctionDetail Page** (`pages/auction-detail/`)
   - **AuctionDetails Widget**: all fields from detail DTO
   - **Respect DTO flags** (conditional rendering):
@@ -101,9 +121,11 @@ The application is a modern React frontend with TypeScript that allows users to 
     - Причина отмены (если есть)
   - **Empty State**: «Ставок пока нет»
   - **Hidden History State**: when `hide_bets_history=true` show info message instead of table
-- **Trading Status Badges**: `AuctionTypeBadge`, `AuctionStatusBadge`, `TradingStatusBadge` with full enum mappings (labels + colors)
+- **Trading Status Badges**: `AuctionTypeBadge`, `AuctionStatusBadge`, `TradingStatusBadge` with full enum mappings
+  (labels + colors)
 
-### Phase 5: Advanced Features & Polish (4-5 days)
+### Phase 5: Advanced Features & Polish
+
 - **Search & Filter System Enhancements**
   - Debounced search input for `cargo_num`
   - `bid_measurement_type` (PerRoute/PerKm) display in card/detail
@@ -120,8 +142,10 @@ The application is a modern React frontend with TypeScript that allows users to 
   - 422 → field-level form errors (already in PlaceBidForm)
 - **Accessibility**: semantic HTML, ARIA labels, focus management, color contrast
 
-### Phase 6: Testing & Quality Assurance (3-5 days)
+### Phase 6: Testing & Quality Assurance
+
 **Unit Tests (Vitest) — MINIMUM COVERAGE FOR PURE LOGIC:**
+
 - Search params parsing & Zod schemas (`features/auction-filters/model/`)
 - Request builders (`shared/api/request-builders.ts`)
 - ViewModel mappers DTO → UI (`entities/auction/model/mappers.ts`)
@@ -130,14 +154,17 @@ The application is a modern React frontend with TypeScript that allows users to 
 - City selector filtering (`shared/lib/cities.ts`)
 
 **Integration Tests (MSW + React Testing Library):**
+
 - Auction list: filter → URL sync → API call → render cards
 - Place Bet flow: open page → fill form (validation) → submit → success → redirect → data updated
 - Detail page: DTO flags conditional rendering
 - Bets page: empty state, hidden history, all columns render
 
-**Coverage Thresholds**: 50%+ на файлах чистой логики (mappers, schemas, parsers). ТЗ требует "желательно минимальные тесты" — фокус на качестве покрытия четырёх типов логики, а не на цифре общего coverage.
+**Coverage Thresholds**: 50%+ на файлах чистой логики (mappers, schemas, parsers). ТЗ требует "желательно минимальные
+тесты" — фокус на качестве покрытия четырёх типов логики, а не на цифре общего coverage.
 
-### Phase 7: Documentation & Deployment (2-3 days)
+### Phase 7: Documentation & Deployment
+
 - **AI_USAGE.md** — **MANDATORY DELIVERABLE** with:
   - Which parts were done with AI assistance
   - Which architectural decisions were made independently
@@ -159,27 +186,29 @@ The application is a modern React frontend with TypeScript that allows users to 
 
 ## 3. Dependencies & Milestones (Updated)
 
-| Task | Priority | Dependencies |
-| :--- | :--- | :--- |
-| Environment Setup & Docker | High | None |
-| Core API Integration + MSW Store + Mock Cities | High | Environment Setup |
-| State Management (TanStack Query + Zustand + Router) | High | Core API Integration |
-| Auction Listing + **Full Filters + Prefetch** | High | State Management |
-| **Place Bet Page (Separate Route)** | High | Auction Listing, State Management |
-| Auction Detail + **DTO Flags + Bets Page (Full Fields)** | High | Auction Listing |
-| Responsive Design & Accessibility | Medium | All core features |
-| Testing (Unit + Integration + E2E) | High | All features |
-| **AI_USAGE.md + README + Documentation** | High | Testing |
-| Deployment & CI/CD | Medium | Documentation |
+| Task                                                     | Priority | Dependencies                      |
+| :------------------------------------------------------- | :------- | :-------------------------------- |
+| Environment Setup & Docker                               | High     | None                              |
+| Core API Integration + MSW Store + Mock Cities           | High     | Environment Setup                 |
+| State Management (TanStack Query + Zustand + Router)     | High     | Core API Integration              |
+| Auction Listing + **Full Filters + Prefetch**            | High     | State Management                  |
+| **Place Bet Page (Separate Route)**                      | High     | Auction Listing, State Management |
+| Auction Detail + **DTO Flags + Bets Page (Full Fields)** | High     | Auction Listing                   |
+| Responsive Design & Accessibility                        | Medium   | All core features                 |
+| Testing (Unit + Integration + E2E)                       | High     | All features                      |
+| **AI_USAGE.md + README + Documentation**                 | High     | Testing                           |
+| Deployment & CI/CD                                       | Medium   | Documentation                     |
 
 ---
 
 ## 4. Critical Path
 
-The critical path is:
-**Environment Setup → Core API Integration + MSW Store + Mock Cities → State Management → Auction Listing + Full Filters → Place Bet Page (Separate Route) → Auction Detail + DTO Flags + Bets Page → Testing → AI_USAGE.md + Documentation**
+The critical path is: **Environment Setup → Core API Integration + MSW Store + Mock Cities → State Management → Auction
+Listing + Full Filters → Place Bet Page (Separate Route) → Auction Detail + DTO Flags + Bets Page → Testing →
+AI_USAGE.md + Documentation**
 
 Any delay in these steps will impact the entire timeline. Special attention should be paid to:
+
 - **MSW mutable store with real state updates** (critical for bid flow testing)
 - **Mock Cities Dictionary** (blocks filter implementation)
 - **Place Bet as separate page** (architectural decision, not a modal)
@@ -192,17 +221,17 @@ Any delay in these steps will impact the entire timeline. Special attention shou
 
 ## 5. Risk Management (Updated)
 
-| Risk | Impact | Probability | Mitigation |
-| :--- | :--- | :--- | :--- |
-| **Missing mandatory fields in UI** (card, bets, form) | Critical — fails test assignment | High | **Checklist-driven development**: each component has acceptance criteria from test assignment |
-| **Place Bet implemented as modal not page** | Critical — fails test assignment | Medium | **Enforce in Phase 3.5**: separate `pages/place-bet/`, route in router, link from card/detail |
-| **Mock Cities Dictionary incomplete** | High — blocks filters | Medium | Create `shared/lib/cities.ts` + `shared/ui/city-selector` in Phase 2 |
-| **DTO flags not respected on detail** | High — fails test assignment | Medium | Explicit conditional rendering tasks in Phase 4 |
-| **Bet validation without min/max/step** | High — fails test assignment | Medium | Schema factory `createPlaceBetSchema(tradingPrice)` in Phase 3.5 |
-| **MSW store doesn't update trading state after bid** | High — breaks integration tests | Medium | Design store structure in Phase 2: `auctions[uuid].trading.{status_mobile, your, price}` |
-| **AI_USAGE.md forgotten** | Medium — fails test assignment | Low | **Explicit task in Phase 7**, template prepared early |
-| **Time estimation inaccuracies** | Medium | High | Break tasks into ≤1 day subtasks, daily check-ins |
-| **API integration issues with backend** | Medium | Low | MSW mocks fully match OpenAPI contract |
+| Risk                                                  | Impact                           | Probability | Mitigation                                                                                    |
+| :---------------------------------------------------- | :------------------------------- | :---------- | :-------------------------------------------------------------------------------------------- |
+| **Missing mandatory fields in UI** (card, bets, form) | Critical — fails test assignment | High        | **Checklist-driven development**: each component has acceptance criteria from test assignment |
+| **Place Bet implemented as modal not page**           | Critical — fails test assignment | Medium      | **Enforce in Phase 3.5**: separate `pages/place-bet/`, route in router, link from card/detail |
+| **Mock Cities Dictionary incomplete**                 | High — blocks filters            | Medium      | Create `shared/lib/cities.ts` + `shared/ui/city-selector` in Phase 2                          |
+| **DTO flags not respected on detail**                 | High — fails test assignment     | Medium      | Explicit conditional rendering tasks in Phase 4                                               |
+| **Bet validation without min/max/step**               | High — fails test assignment     | Medium      | Schema factory `createPlaceBetSchema(tradingPrice)` in Phase 3.5                              |
+| **MSW store doesn't update trading state after bid**  | High — breaks integration tests  | Medium      | Design store structure in Phase 2: `auctions[uuid].trading.{status_mobile, your, price}`      |
+| **AI_USAGE.md forgotten**                             | Medium — fails test assignment   | Low         | **Explicit task in Phase 7**, template prepared early                                         |
+| **Time estimation inaccuracies**                      | Medium                           | High        | Break tasks into ≤1 day subtasks, daily check-ins                                             |
+| **API integration issues with backend**               | Medium                           | Low         | MSW mocks fully match OpenAPI contract                                                        |
 
 ---
 
@@ -212,7 +241,8 @@ Any delay in these steps will impact the entire timeline. Special attention shou
 - ✅ **Place Bet accessible at `/auctions/:uuid/place-bet`** (direct link works)
 - ✅ **All mandatory filters present and functional** (cargo_num, is_available, is_bidder, auc_type, cities)
 - ✅ **Auction Card displays all 11 mandatory field groups**
-- ✅ **Detail page respects all 4 DTO flags** (can_set_bet, hide_bets_history, hide_points_address_and_contacts, no_view_cargo_price)
+- ✅ **Detail page respects all 4 DTO flags** (can_set_bet, hide_bets_history, hide_points_address_and_contacts,
+  no_view_cargo_price)
 - ✅ **Bets Page shows all 8 mandatory columns + empty state + hidden history state**
 - ✅ **Place Bid Form validates min/max/step + shows hints**
 - ✅ **Mock Cities Dictionary powers load_city/unload_city selectors**
@@ -228,6 +258,7 @@ Any delay in these steps will impact the entire timeline. Special attention shou
 ## 7. Definition of Done (Per Task)
 
 A task is **Done** when:
+
 1. Code implements all acceptance criteria from test assignment
 2. Component follows naming convention (`*.component.tsx`)
 3. FSD layer boundaries respected (no cross-layer imports)
@@ -243,7 +274,8 @@ A task is **Done** when:
 
 ## 8. Final Notes
 
-This plan incorporates **all findings from the compliance analysis** against the test assignment. The key differences from the initial plan:
+This plan incorporates **all findings from the compliance analysis** against the test assignment. The key differences
+from the initial plan:
 
 1. **Place Bet = Separate Page** (not modal) — explicit Phase 3.5
 2. **Complete Filter Set** — 4 additional filters + City Selectors
@@ -256,4 +288,6 @@ This plan incorporates **all findings from the compliance analysis** against the
 9. **Explicit MSW Store Structure** — designed upfront in Phase 2
 10. **Checklist-driven verification** — every mandatory field traced to component
 
-The implementation must follow the documented architecture, state management strategy, and coding standards strictly. **Daily verification against the test assignment checklist is recommended** to avoid scope drift. Regular code reviews and pair programming sessions are recommended to maintain quality throughout development.
+The implementation must follow the documented architecture, state management strategy, and coding standards strictly.
+**Daily verification against the test assignment checklist is recommended** to avoid scope drift. Regular code reviews
+and pair programming sessions are recommended to maintain quality throughout development.

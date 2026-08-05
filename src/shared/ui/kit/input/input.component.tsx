@@ -1,8 +1,8 @@
-import { forwardRef, type InputHTMLAttributes } from 'react'
+import { forwardRef, type InputHTMLAttributes } from 'react';
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
-  label?: string
-  error?: string
+  label?: string;
+  error?: string;
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
@@ -23,10 +23,14 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           className={`rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500 ${error ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''} ${className}`}
           {...props}
         />
-        {error && <p id={`${id}-error`} className="text-xs text-red-600" role="alert">{error}</p>}
+        {error && (
+          <p id={`${id}-error`} className="text-xs text-red-600" role="alert">
+            {error}
+          </p>
+        )}
       </div>
-    )
-  },
-)
+    );
+  }
+);
 
-Input.displayName = 'Input'
+Input.displayName = 'Input';

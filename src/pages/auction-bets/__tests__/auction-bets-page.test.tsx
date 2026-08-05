@@ -1,9 +1,15 @@
-import { describe, it, expect, beforeAll, afterAll, afterEach } from 'vitest'
-import { http, HttpResponse } from 'msw'
-import { setupServer } from 'msw/node'
-import { renderWithProviders, screen, waitFor } from '@/test-utils'
-import { AuctionBetsPage } from '@/pages/auction-bets/ui/auction-bets-page.component'
-import { createRouter, createRoute, createRootRoute, createMemoryHistory, RouterProvider } from '@tanstack/react-router'
+import { describe, it, expect, beforeAll, afterAll, afterEach } from 'vitest';
+import { http, HttpResponse } from 'msw';
+import { setupServer } from 'msw/node';
+import { renderWithProviders, screen, waitFor } from '@/test-utils';
+import { AuctionBetsPage } from '@/pages/auction-bets/ui/auction-bets-page.component';
+import {
+  createRouter,
+  createRoute,
+  createRootRoute,
+  createMemoryHistory,
+  RouterProvider,
+} from '@tanstack/react-router';
 
 const mockAuction = {
   main: {
@@ -67,19 +73,43 @@ const mockAuction = {
     send_deal_before_load: false,
     chat_id: null,
     price: {
-      start: 200000, start_no_vat: null, current: 150000, current_no_vat: 120000,
-      available: 151000, available_no_vat: 120800, min: 145000, min_no_vat: 116000,
-      max: 200000, max_no_vat: 160000, step: 1000, step_no_vat: 800, price_per_km: 25,
+      start: 200000,
+      start_no_vat: null,
+      current: 150000,
+      current_no_vat: 120000,
+      available: 151000,
+      available_no_vat: 120800,
+      min: 145000,
+      min_no_vat: 116000,
+      max: 200000,
+      max_no_vat: 160000,
+      step: 1000,
+      step_no_vat: 800,
+      price_per_km: 25,
     },
     your: { bet: false, last_bet: null, last_bet_with_vat: null, win: false },
-    settings: { prolong_after_bet: 5, winner_confirm: null, winner_counter_mode: null, transmission_time_in: null, coefficient: null },
+    settings: {
+      prolong_after_bet: 5,
+      winner_confirm: null,
+      winner_counter_mode: null,
+      transmission_time_in: null,
+      coefficient: null,
+    },
   },
-  payment: { condition: null, condition_predefined: null, form: 'Безналичный', delay: null, delay_type: null, currency_code: 643, prepay: null },
+  payment: {
+    condition: null,
+    condition_predefined: null,
+    form: 'Безналичный',
+    delay: null,
+    delay_type: null,
+    currency_code: 643,
+    prepay: null,
+  },
   assembly: { num: null, date: null },
   routes: [],
   admitted_organizations: [],
   hide_bets_history: false,
-}
+};
 
 const mockBets = [
   {
@@ -101,7 +131,12 @@ const mockBets = [
     is_win: true,
     run_number: 0,
     cancel_reason: '',
-    price_info: { price_with_vat: 150000, price_no_vat: 125000, payment_type: 'Безналичный', vat_rate: '20' },
+    price_info: {
+      price_with_vat: 150000,
+      price_no_vat: 125000,
+      payment_type: 'Безналичный',
+      vat_rate: '20',
+    },
   },
   {
     id: 2,
@@ -122,123 +157,134 @@ const mockBets = [
     is_win: false,
     run_number: 0,
     cancel_reason: '',
-    price_info: { price_with_vat: 160000, price_no_vat: 133333, payment_type: 'Безналичный', vat_rate: '20' },
+    price_info: {
+      price_with_vat: 160000,
+      price_no_vat: 133333,
+      payment_type: 'Безналичный',
+      vat_rate: '20',
+    },
   },
-]
+];
 
 const handlers = [
   http.get('/api/v1/auctions/:uuid', async ({ params }) => {
     if (params.uuid === 'test-uuid-1') {
-      return HttpResponse.json(mockAuction)
+      return HttpResponse.json(mockAuction);
     }
-    return HttpResponse.json({ code: 'not_found', title: 'Not Found', message: 'Auction not found' }, { status: 404 })
+    return HttpResponse.json(
+      { code: 'not_found', title: 'Not Found', message: 'Auction not found' },
+      { status: 404 }
+    );
   }),
   http.get('/api/v1/auctions/:uuid/bets', async ({ params }) => {
     if (params.uuid === 'test-uuid-1') {
-      return HttpResponse.json({ bets: mockBets })
+      return HttpResponse.json({ bets: mockBets });
     }
-    return HttpResponse.json({ bets: [] })
+    return HttpResponse.json({ bets: [] });
   }),
-]
+];
 
-const server = setupServer(...handlers)
+const server = setupServer(...handlers);
 
-beforeAll(() => server.listen())
-afterEach(() => server.resetHandlers())
-afterAll(() => server.close())
+beforeAll(() => server.listen());
+afterEach(() => server.resetHandlers());
+afterAll(() => server.close());
 
 function createTestRouter(uuid = 'test-uuid-1') {
   const rootRoute = createRootRoute({
     component: () => <AuctionBetsPage />,
-  })
+  });
 
   const betsRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/auctions/$auctionUuid/bets',
     component: () => <AuctionBetsPage />,
-  })
+  });
 
-  const routeTree = rootRoute.addChildren([betsRoute])
+  const routeTree = rootRoute.addChildren([betsRoute]);
   return createRouter({
     routeTree,
     defaultPreload: 'intent',
     history: createMemoryHistory({ initialEntries: [`/auctions/${uuid}/bets`] }),
-  })
+  });
 }
 
 describe('AuctionBetsPage integration', () => {
   it('renders bets table with data', async () => {
-    const router = createTestRouter()
-    renderWithProviders(<RouterProvider router={router} />)
+    const router = createTestRouter();
+    renderWithProviders(<RouterProvider router={router} />);
 
     await waitFor(() => {
-      expect(screen.getByText('ООО "Перевозчик 1"')).toBeInTheDocument()
-      expect(screen.getByText('ООО "Перевозчик 2"')).toBeInTheDocument()
-    })
-  })
+      expect(screen.getByText('ООО "Перевозчик 1"')).toBeInTheDocument();
+      expect(screen.getByText('ООО "Перевозчик 2"')).toBeInTheDocument();
+    });
+  });
 
   it('displays winner badge', async () => {
-    const router = createTestRouter()
-    renderWithProviders(<RouterProvider router={router} />)
+    const router = createTestRouter();
+    renderWithProviders(<RouterProvider router={router} />);
 
     await waitFor(() => {
-      expect(screen.getByText('Победитель')).toBeInTheDocument()
-    })
-  })
+      expect(screen.getByText('Победитель')).toBeInTheDocument();
+    });
+  });
 
   it('shows sort buttons', async () => {
-    const router = createTestRouter()
-    renderWithProviders(<RouterProvider router={router} />)
+    const router = createTestRouter();
+    renderWithProviders(<RouterProvider router={router} />);
 
     await waitFor(() => {
-      expect(screen.getByText(/Место/)).toBeInTheDocument()
-      expect(screen.getByText(/Сумма/)).toBeInTheDocument()
-      expect(screen.getByText(/Дата/)).toBeInTheDocument()
-    })
-  })
+      expect(screen.getByText(/Место/)).toBeInTheDocument();
+      expect(screen.getByText(/Сумма/)).toBeInTheDocument();
+      expect(screen.getByText(/Дата/)).toBeInTheDocument();
+    });
+  });
 
   it('shows empty state when no bets', async () => {
     server.use(
       http.get('/api/v1/auctions/:uuid/bets', async () => {
-        return HttpResponse.json({ bets: [] })
-      }),
-    )
+        return HttpResponse.json({ bets: [] });
+      })
+    );
 
-    const router = createTestRouter()
-    renderWithProviders(<RouterProvider router={router} />)
+    const router = createTestRouter();
+    renderWithProviders(<RouterProvider router={router} />);
 
     await waitFor(() => {
-      expect(screen.getByText('Ставок пока нет')).toBeInTheDocument()
-    })
-  })
+      expect(screen.getByText('Ставок пока нет')).toBeInTheDocument();
+    });
+  });
 
   it('shows back link', async () => {
-    const router = createTestRouter()
-    renderWithProviders(<RouterProvider router={router} />)
+    const router = createTestRouter();
+    renderWithProviders(<RouterProvider router={router} />);
 
     await waitFor(() => {
-      expect(screen.getByText('← К аукциону')).toBeInTheDocument()
-    })
-  })
+      expect(screen.getByText('← К аукциону')).toBeInTheDocument();
+    });
+  });
 
   it('shows empty state when hide_bets_history is true', async () => {
     server.use(
       http.get('/api/v1/auctions/:uuid', async ({ params }) => {
         if (params.uuid === 'test-uuid-1') {
-          return HttpResponse.json({ ...mockAuction, hide_bets_history: true })
+          return HttpResponse.json({ ...mockAuction, hide_bets_history: true });
         }
-        return HttpResponse.json({ code: 'not_found', title: 'Not Found', message: 'Auction not found' }, { status: 404 })
+        return HttpResponse.json(
+          { code: 'not_found', title: 'Not Found', message: 'Auction not found' },
+          { status: 404 }
+        );
       }),
       http.get('/api/v1/auctions/:uuid/bets', async () => {
-        return HttpResponse.json({ bets: [] })
-      }),
-    )
+        return HttpResponse.json({ bets: [] });
+      })
+    );
 
-    const router = createTestRouter()
-    renderWithProviders(<RouterProvider router={router} />)
+    const router = createTestRouter();
+    renderWithProviders(<RouterProvider router={router} />);
 
     await waitFor(() => {
-      expect(screen.getByText('Ставок пока нет')).toBeInTheDocument()
-    })
-  })
-})
+      expect(screen.getByText('Ставок пока нет')).toBeInTheDocument();
+    });
+  });
+});

@@ -1,33 +1,39 @@
-import { describe, it, expect, beforeAll, afterAll, afterEach } from 'vitest'
-import { http, HttpResponse } from 'msw'
-import { setupServer } from 'msw/node'
-import { renderWithProviders, screen, waitFor } from '@/test-utils'
-import { AuctionsListPage } from '@/pages/auctions-list/ui/auctions-list-page.component'
-import { createRouter, createRoute, createRootRoute, createMemoryHistory, RouterProvider } from '@tanstack/react-router'
+import { describe, it, expect, beforeAll, afterAll, afterEach } from 'vitest';
+import { http, HttpResponse } from 'msw';
+import { setupServer } from 'msw/node';
+import { renderWithProviders, screen, waitFor } from '@/test-utils';
+import { AuctionsListPage } from '@/pages/auctions-list/ui/auctions-list-page.component';
+import {
+  createRouter,
+  createRoute,
+  createRootRoute,
+  createMemoryHistory,
+  RouterProvider,
+} from '@tanstack/react-router';
 
 function createTestRouter() {
   const rootRoute = createRootRoute({
     component: () => <AuctionsListPage />,
-  })
+  });
 
   const indexRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/',
     component: () => <AuctionsListPage />,
-  })
+  });
 
   const listRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/auctions',
     component: () => <AuctionsListPage />,
-  })
+  });
 
-  const routeTree = rootRoute.addChildren([indexRoute, listRoute])
+  const routeTree = rootRoute.addChildren([indexRoute, listRoute]);
   return createRouter({
     routeTree,
     defaultPreload: 'intent',
     history: createMemoryHistory({ initialEntries: ['/auctions'] }),
-  })
+  });
 }
 
 const mockAuctions = [
@@ -53,8 +59,20 @@ const mockAuctions = [
       is_hide_organization: false,
     },
     route: {
-      load: { city: 'Москва', address: 'ул. Тест, 1', date: '2025-07-10T00:00:00Z', city_gc_id: 1, points_count: 1 },
-      unload: { city: 'Казань', address: 'ул. Доставки, 1', date: '2025-07-12T00:00:00Z', city_gc_id: 3, points_count: 1 },
+      load: {
+        city: 'Москва',
+        address: 'ул. Тест, 1',
+        date: '2025-07-10T00:00:00Z',
+        city_gc_id: 1,
+        points_count: 1,
+      },
+      unload: {
+        city: 'Казань',
+        address: 'ул. Доставки, 1',
+        date: '2025-07-12T00:00:00Z',
+        city_gc_id: 3,
+        points_count: 1,
+      },
     },
     cargo: {
       name: 'Груз тестовый',
@@ -102,7 +120,7 @@ const mockAuctions = [
     },
     payment: { form: 'Безналичный', currency_code: 643, consignor: '', consignee: '' },
   },
-]
+];
 
 const handlers = [
   http.post('/api/v1/auctions/list', async () => {
@@ -116,53 +134,53 @@ const handlers = [
         to: 1,
         total: 1,
       },
-    })
+    });
   }),
-]
+];
 
-const server = setupServer(...handlers)
+const server = setupServer(...handlers);
 
-beforeAll(() => server.listen())
-afterEach(() => server.resetHandlers())
-afterAll(() => server.close())
+beforeAll(() => server.listen());
+afterEach(() => server.resetHandlers());
+afterAll(() => server.close());
 
 describe('AuctionListPage integration', () => {
   it('renders auction cards after loading', async () => {
-    const router = createTestRouter()
-    renderWithProviders(<RouterProvider router={router} />)
+    const router = createTestRouter();
+    renderWithProviders(<RouterProvider router={router} />);
 
     await waitFor(() => {
-      expect(screen.getByText('ЗАЯВ-0001')).toBeInTheDocument()
-    })
-  })
+      expect(screen.getByText('ЗАЯВ-0001')).toBeInTheDocument();
+    });
+  });
 
   it('displays auction type badge', async () => {
-    const router = createTestRouter()
-    renderWithProviders(<RouterProvider router={router} />)
+    const router = createTestRouter();
+    renderWithProviders(<RouterProvider router={router} />);
 
     await waitFor(() => {
-      expect(screen.getByText('Request')).toBeInTheDocument()
-    })
-  })
+      expect(screen.getByText('Request')).toBeInTheDocument();
+    });
+  });
 
   it('displays route cities', async () => {
-    const router = createTestRouter()
-    renderWithProviders(<RouterProvider router={router} />)
+    const router = createTestRouter();
+    renderWithProviders(<RouterProvider router={router} />);
 
     await waitFor(() => {
-      expect(screen.getByText('Москва')).toBeInTheDocument()
-      expect(screen.getByText('Казань')).toBeInTheDocument()
-    })
-  })
+      expect(screen.getByText('Москва')).toBeInTheDocument();
+      expect(screen.getByText('Казань')).toBeInTheDocument();
+    });
+  });
 
   it('shows action button when can_set_bet', async () => {
-    const router = createTestRouter()
-    renderWithProviders(<RouterProvider router={router} />)
+    const router = createTestRouter();
+    renderWithProviders(<RouterProvider router={router} />);
 
     await waitFor(() => {
-      expect(screen.getByText('Сделать ставку')).toBeInTheDocument()
-    })
-  })
+      expect(screen.getByText('Сделать ставку')).toBeInTheDocument();
+    });
+  });
 
   it('shows empty state when no auctions', async () => {
     server.use(
@@ -170,15 +188,15 @@ describe('AuctionListPage integration', () => {
         return HttpResponse.json({
           data: [],
           meta: { current_page: 1, from: 0, last_page: 1, per_page: 20, to: 0, total: 0 },
-        })
-      }),
-    )
+        });
+      })
+    );
 
-    const router = createTestRouter()
-    renderWithProviders(<RouterProvider router={router} />)
+    const router = createTestRouter();
+    renderWithProviders(<RouterProvider router={router} />);
 
     await waitFor(() => {
-      expect(screen.getByText('Ничего не найдено')).toBeInTheDocument()
-    })
-  })
-})
+      expect(screen.getByText('Ничего не найдено')).toBeInTheDocument();
+    });
+  });
+});

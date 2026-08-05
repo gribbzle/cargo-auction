@@ -1,9 +1,16 @@
-import { describe, it, expect, beforeAll, afterAll, afterEach } from 'vitest'
-import { http, HttpResponse } from 'msw'
-import { setupServer } from 'msw/node'
-import { renderWithProviders, screen, waitFor, userEvent } from '@/test-utils'
-import { PlaceBetPage } from '@/pages/place-bet/ui/place-bet-page.component'
-import { createRouter, createRoute, createRootRoute, Outlet, createMemoryHistory, RouterProvider } from '@tanstack/react-router'
+import { describe, it, expect, beforeAll, afterAll, afterEach } from 'vitest';
+import { http, HttpResponse } from 'msw';
+import { setupServer } from 'msw/node';
+import { renderWithProviders, screen, waitFor, userEvent } from '@/test-utils';
+import { PlaceBetPage } from '@/pages/place-bet/ui/place-bet-page.component';
+import {
+  createRouter,
+  createRoute,
+  createRootRoute,
+  Outlet,
+  createMemoryHistory,
+  RouterProvider,
+} from '@tanstack/react-router';
 
 const mockAuction = {
   main: {
@@ -67,178 +74,210 @@ const mockAuction = {
     send_deal_before_load: false,
     chat_id: null,
     price: {
-      start: 200000, start_no_vat: null, current: 150000, current_no_vat: 120000,
-      available: 151000, available_no_vat: 120800, min: 145000, min_no_vat: 116000,
-      max: 200000, max_no_vat: 160000, step: 1000, step_no_vat: 800, price_per_km: 25,
+      start: 200000,
+      start_no_vat: null,
+      current: 150000,
+      current_no_vat: 120000,
+      available: 151000,
+      available_no_vat: 120800,
+      min: 145000,
+      min_no_vat: 116000,
+      max: 200000,
+      max_no_vat: 160000,
+      step: 1000,
+      step_no_vat: 800,
+      price_per_km: 25,
     },
     your: { bet: false, last_bet: null, last_bet_with_vat: null, win: false },
-    settings: { prolong_after_bet: 5, winner_confirm: null, winner_counter_mode: null, transmission_time_in: null, coefficient: null },
+    settings: {
+      prolong_after_bet: 5,
+      winner_confirm: null,
+      winner_counter_mode: null,
+      transmission_time_in: null,
+      coefficient: null,
+    },
   },
-  payment: { condition: null, condition_predefined: null, form: 'Безналичный', delay: null, delay_type: null, currency_code: 643, prepay: null },
+  payment: {
+    condition: null,
+    condition_predefined: null,
+    form: 'Безналичный',
+    delay: null,
+    delay_type: null,
+    currency_code: 643,
+    prepay: null,
+  },
   assembly: { num: null, date: null },
   routes: [],
   admitted_organizations: [],
   hide_bets_history: false,
-}
+};
 
 const handlers = [
   http.get('/api/v1/auctions/:uuid', async ({ params }) => {
     if (params.uuid === 'test-uuid-1') {
-      return HttpResponse.json(mockAuction)
+      return HttpResponse.json(mockAuction);
     }
-    return HttpResponse.json({ code: 'not_found', title: 'Not Found', message: 'Auction not found' }, { status: 404 })
+    return HttpResponse.json(
+      { code: 'not_found', title: 'Not Found', message: 'Auction not found' },
+      { status: 404 }
+    );
   }),
   http.post('/api/v1/auctions/:uuid/bets', async ({ request }) => {
-    const body = await request.json() as { price?: number }
-    const price = body?.price
+    const body = (await request.json()) as { price?: number };
+    const price = body?.price;
     if (price != null && (price < 145000 || price > 200000)) {
-      return HttpResponse.json({
-        code: 'validation_failed',
-        message: 'Validation failed',
-        errors: [{ field: 'price', message: 'Минимальная ставка: 145 000 ₽', code: 'too_low' }],
-      }, { status: 422 })
+      return HttpResponse.json(
+        {
+          code: 'validation_failed',
+          message: 'Validation failed',
+          errors: [{ field: 'price', message: 'Минимальная ставка: 145 000 ₽', code: 'too_low' }],
+        },
+        { status: 422 }
+      );
     }
     // Delay to allow test to catch pending state
-    await new Promise(resolve => setTimeout(resolve, 100))
-    return new HttpResponse(null, { status: 200 })
+    await new Promise((resolve) => setTimeout(resolve, 100));
+    return new HttpResponse(null, { status: 200 });
   }),
-]
+];
 
-const server = setupServer(...handlers)
+const server = setupServer(...handlers);
 
-beforeAll(() => server.listen())
-afterEach(() => server.resetHandlers())
-afterAll(() => server.close())
+beforeAll(() => server.listen());
+afterEach(() => server.resetHandlers());
+afterAll(() => server.close());
 
 function createTestRouter(uuid = 'test-uuid-1', initialPath?: string) {
   const rootRoute = createRootRoute({
     component: () => <Outlet />,
-  })
+  });
 
   const placeBetRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/auctions/$auctionUuid/place-bet',
     component: () => <PlaceBetPage />,
-  })
+  });
 
   const detailRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/auctions/$auctionUuid',
     component: () => <div>Auction Detail</div>,
-  })
+  });
 
-  const routeTree = rootRoute.addChildren([placeBetRoute, detailRoute])
+  const routeTree = rootRoute.addChildren([placeBetRoute, detailRoute]);
   return createRouter({
     routeTree,
     defaultPreload: 'intent',
-    history: createMemoryHistory({ initialEntries: [initialPath ?? `/auctions/${uuid}/place-bet`] }),
-  })
+    history: createMemoryHistory({
+      initialEntries: [initialPath ?? `/auctions/${uuid}/place-bet`],
+    }),
+  });
 }
 
 describe('PlaceBetPage integration', () => {
   it('renders the form after loading', async () => {
-    const router = createTestRouter()
-    renderWithProviders(<RouterProvider router={router} />)
+    const router = createTestRouter();
+    renderWithProviders(<RouterProvider router={router} />);
 
     await waitFor(() => {
-      expect(screen.getByRole('heading', { name: 'Сделать ставку' })).toBeInTheDocument()
-    })
-  })
+      expect(screen.getByRole('heading', { name: 'Сделать ставку' })).toBeInTheDocument();
+    });
+  });
 
   it('displays price input field', async () => {
-    const router = createTestRouter()
-    renderWithProviders(<RouterProvider router={router} />)
+    const router = createTestRouter();
+    renderWithProviders(<RouterProvider router={router} />);
 
     await waitFor(() => {
-      expect(screen.getByLabelText(/Ваша ставка/)).toBeInTheDocument()
-    })
-  })
+      expect(screen.getByLabelText(/Ваша ставка/)).toBeInTheDocument();
+    });
+  });
 
   it('shows quick bet buttons', async () => {
-    const router = createTestRouter()
-    renderWithProviders(<RouterProvider router={router} />)
+    const router = createTestRouter();
+    renderWithProviders(<RouterProvider router={router} />);
 
     await waitFor(() => {
-      expect(screen.getByText('Быстрая ставка')).toBeInTheDocument()
-      expect(screen.getByText('Мин.')).toBeInTheDocument()
-      expect(screen.getByText('Макс.')).toBeInTheDocument()
-    })
-  })
+      expect(screen.getByText('Быстрая ставка')).toBeInTheDocument();
+      expect(screen.getByText('Мин.')).toBeInTheDocument();
+      expect(screen.getByText('Макс.')).toBeInTheDocument();
+    });
+  });
 
   it('shows sidebar with current price info', async () => {
-    const router = createTestRouter()
-    renderWithProviders(<RouterProvider router={router} />)
+    const router = createTestRouter();
+    renderWithProviders(<RouterProvider router={router} />);
 
     await waitFor(() => {
-      expect(screen.getByText('Текущая информация')).toBeInTheDocument()
-    })
-  })
+      expect(screen.getByText('Текущая информация')).toBeInTheDocument();
+    });
+  });
 
   it('shows breadcrumbs', async () => {
-    const router = createTestRouter()
-    renderWithProviders(<RouterProvider router={router} />)
+    const router = createTestRouter();
+    renderWithProviders(<RouterProvider router={router} />);
 
     await waitFor(() => {
-      expect(screen.getByRole('navigation', { name: 'Breadcrumb' })).toBeInTheDocument()
-      expect(screen.getAllByText('ЗАЯВ-0001').length).toBeGreaterThanOrEqual(1)
-    })
-  })
+      expect(screen.getByRole('navigation', { name: 'Breadcrumb' })).toBeInTheDocument();
+      expect(screen.getAllByText('ЗАЯВ-0001').length).toBeGreaterThanOrEqual(1);
+    });
+  });
 
   it('submits bet and shows pending state', async () => {
-    const user = userEvent.setup()
-    const router = createTestRouter()
-    renderWithProviders(<RouterProvider router={router} />)
+    const user = userEvent.setup();
+    const router = createTestRouter();
+    renderWithProviders(<RouterProvider router={router} />);
 
     await waitFor(() => {
-      expect(screen.getByRole('heading', { name: 'Сделать ставку' })).toBeInTheDocument()
-    })
+      expect(screen.getByRole('heading', { name: 'Сделать ставку' })).toBeInTheDocument();
+    });
 
-    const input = screen.getByLabelText(/Ваша ставка/)
-    await user.clear(input)
-    await user.type(input, '150000')
+    const input = screen.getByLabelText(/Ваша ставка/);
+    await user.clear(input);
+    await user.type(input, '150000');
 
-    const submitButton = screen.getByRole('button', { name: 'Подтвердить ставку' })
-    await user.click(submitButton)
+    const submitButton = screen.getByRole('button', { name: 'Подтвердить ставку' });
+    await user.click(submitButton);
 
     await waitFor(() => {
-      expect(submitButton).toBeDisabled()
-    })
-  })
+      expect(submitButton).toBeDisabled();
+    });
+  });
 
   it('shows validation error for out-of-range price', async () => {
-    const user = userEvent.setup()
-    const router = createTestRouter()
-    renderWithProviders(<RouterProvider router={router} />)
+    const user = userEvent.setup();
+    const router = createTestRouter();
+    renderWithProviders(<RouterProvider router={router} />);
 
     await waitFor(() => {
-      expect(screen.getByRole('heading', { name: 'Сделать ставку' })).toBeInTheDocument()
-    })
+      expect(screen.getByRole('heading', { name: 'Сделать ставку' })).toBeInTheDocument();
+    });
 
-    const input = screen.getByLabelText(/Ваша ставка/)
-    await user.clear(input)
-    await user.type(input, '50000')
+    const input = screen.getByLabelText(/Ваша ставка/);
+    await user.clear(input);
+    await user.type(input, '50000');
 
-    const submitButton = screen.getByRole('button', { name: 'Подтвердить ставку' })
-    await user.click(submitButton)
+    const submitButton = screen.getByRole('button', { name: 'Подтвердить ставку' });
+    await user.click(submitButton);
 
     await waitFor(() => {
-      expect(screen.getByText(/Минимальная ставка/)).toBeInTheDocument()
-    })
-  })
+      expect(screen.getByText(/Минимальная ставка/)).toBeInTheDocument();
+    });
+  });
 
   it('sets min price via quick bet button', async () => {
-    const user = userEvent.setup()
-    const router = createTestRouter()
-    renderWithProviders(<RouterProvider router={router} />)
+    const user = userEvent.setup();
+    const router = createTestRouter();
+    renderWithProviders(<RouterProvider router={router} />);
 
     await waitFor(() => {
-      expect(screen.getByRole('heading', { name: 'Сделать ставку' })).toBeInTheDocument()
-    })
+      expect(screen.getByRole('heading', { name: 'Сделать ставку' })).toBeInTheDocument();
+    });
 
-    const minButton = screen.getByText('Мин.')
-    await user.click(minButton)
+    const minButton = screen.getByText('Мин.');
+    await user.click(minButton);
 
-    const input = screen.getByTestId("price") as HTMLInputElement
-    expect(input.value).toBe('145000')
-  })
-})
+    const input = screen.getByTestId('price') as HTMLInputElement;
+    expect(input.value).toBe('145000');
+  });
+});

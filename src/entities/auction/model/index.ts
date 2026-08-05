@@ -1,2 +1,2 @@
-export * from './mappers'
-export * from './auction.constants'
+export * from './mappers';
+export * from './auction.constants';

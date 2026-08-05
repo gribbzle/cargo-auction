@@ -1,4 +1,4 @@
-import { z } from 'zod/v4'
+import { z } from 'zod/v4';
 
 export const auctionFiltersSchema = z.object({
   cargo_num: z.string().optional(),
@@ -16,9 +16,9 @@ export const auctionFiltersSchema = z.object({
   price_to: z.number().optional(),
   per_page: z.number().optional(),
   page: z.number().optional(),
-})
+});
 
-export type AuctionFilters = z.infer<typeof auctionFiltersSchema>
+export type AuctionFilters = z.infer<typeof auctionFiltersSchema>;
 
 export const DEFAULT_FILTERS: AuctionFilters = {
   cargo_num: undefined,
@@ -36,14 +36,14 @@ export const DEFAULT_FILTERS: AuctionFilters = {
   price_to: undefined,
   per_page: 20,
   page: 1,
-}
+};
 
 export const AUC_TYPE_OPTIONS = [
   { value: 'Request', label: 'Request' },
   { value: 'Up', label: 'Up' },
   { value: 'Down', label: 'Down' },
   { value: 'FixPrice', label: 'FixPrice' },
-]
+];
 
 export const STATUS_OPTIONS = [
   { value: 'Planning', label: 'Planning' },
@@ -54,10 +54,10 @@ export const STATUS_OPTIONS = [
   { value: 'Finished', label: 'Finished' },
   { value: 'Stopped', label: 'Stopped' },
   { value: 'Canceled', label: 'Canceled' },
-]
+];
 
 export const PER_PAGE_OPTIONS = [
   { value: '10', label: '10' },
   { value: '20', label: '20' },
   { value: '50', label: '50' },
-]
+];

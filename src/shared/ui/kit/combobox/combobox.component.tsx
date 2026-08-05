@@ -1,20 +1,20 @@
-import { useState, useRef, useEffect, useCallback, type KeyboardEvent } from 'react'
+import { useState, useRef, useEffect, useCallback, type KeyboardEvent } from 'react';
 
 interface ComboboxOption {
-  value: string
-  label: string
-  description?: string
+  value: string;
+  label: string;
+  description?: string;
 }
 
 interface ComboboxProps {
-  id: string
-  label?: string
-  options: ComboboxOption[]
-  value: string
-  onChange: (value: string) => void
-  placeholder?: string
-  error?: string
-  className?: string
+  id: string;
+  label?: string;
+  options: ComboboxOption[];
+  value: string;
+  onChange: (value: string) => void;
+  placeholder?: string;
+  error?: string;
+  className?: string;
 }
 
 export function Combobox({
@@ -27,82 +27,84 @@ export function Combobox({
   className = '',
   id,
 }: ComboboxProps) {
-  const [isOpen, setIsOpen] = useState(false)
-  const [query, setQuery] = useState('')
-  const [activeIndex, setActiveIndex] = useState(-1)
-  const inputRef = useRef<HTMLInputElement>(null)
-  const listRef = useRef<HTMLUListElement>(null)
-  const containerRef = useRef<HTMLDivElement>(null)
+  const [isOpen, setIsOpen] = useState(false);
+  const [query, setQuery] = useState('');
+  const [activeIndex, setActiveIndex] = useState(-1);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const listRef = useRef<HTMLUListElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
-  const filtered = options.filter((opt) =>
-    opt.label.toLowerCase().includes(query.toLowerCase()),
-  )
+  const filtered = options.filter((opt) => opt.label.toLowerCase().includes(query.toLowerCase()));
 
-  const selectedLabel = options.find((opt) => opt.value === value)?.label ?? ''
+  const selectedLabel = options.find((opt) => opt.value === value)?.label ?? '';
 
   const open = useCallback(() => {
-    setIsOpen(true)
-    setActiveIndex(-1)
-  }, [])
+    setIsOpen(true);
+    setActiveIndex(-1);
+  }, []);
 
   const close = useCallback(() => {
-    setIsOpen(false)
-    setQuery('')
-    setActiveIndex(-1)
-  }, [])
+    setIsOpen(false);
+    setQuery('');
+    setActiveIndex(-1);
+  }, []);
 
   const select = useCallback(
     (val: string) => {
-      onChange(val === value ? '' : val)
-      close()
-      inputRef.current?.blur()
+      onChange(val === value ? '' : val);
+      close();
+      inputRef.current?.blur();
     },
-    [onChange, value, close],
-  )
+    [onChange, value, close]
+  );
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
       if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
-        close()
+        close();
       }
     }
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [close])
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [close]);
 
   function handleKeyDown(e: KeyboardEvent<HTMLInputElement>) {
     if (!isOpen) {
       if (e.key === 'ArrowDown' || e.key === 'Enter') {
-        e.preventDefault()
-        open()
+        e.preventDefault();
+        open();
       }
-      return
+      return;
     }
 
     switch (e.key) {
       case 'ArrowDown':
-        e.preventDefault()
-        setActiveIndex((prev) => (prev < filtered.length - 1 ? prev + 1 : 0))
-        break
+        e.preventDefault();
+        setActiveIndex((prev) => (prev < filtered.length - 1 ? prev + 1 : 0));
+        break;
       case 'ArrowUp':
-        e.preventDefault()
-        setActiveIndex((prev) => (prev > 0 ? prev - 1 : filtered.length - 1))
-        break
+        e.preventDefault();
+        setActiveIndex((prev) => (prev > 0 ? prev - 1 : filtered.length - 1));
+        break;
       case 'Enter':
-        e.preventDefault()
+        e.preventDefault();
         if (activeIndex >= 0 && filtered[activeIndex]) {
-          select(filtered[activeIndex].value)
+          select(filtered[activeIndex].value);
         }
-        break
+        break;
       case 'Escape':
-        close()
-        break
+        close();
+        break;
     }
   }
 
   return (
     <div className={`flex flex-col gap-1 relative ${className}`} ref={containerRef}>
-      {label && <label className="text-sm font-medium text-gray-700" htmlFor={id}>{label}</label>}
+      {label && (
+        <label className="text-sm font-medium text-gray-700" htmlFor={id}>
+          {label}
+        </label>
+      )}
       <div className="relative">
         <input
           id={id}
@@ -110,8 +112,8 @@ export function Combobox({
           type="text"
           value={isOpen ? query : selectedLabel}
           onChange={(e) => {
-            setQuery(e.target.value)
-            if (!isOpen) open()
+            setQuery(e.target.value);
+            if (!isOpen) open();
           }}
           onFocus={open}
           onKeyDown={handleKeyDown}
@@ -125,8 +127,8 @@ export function Combobox({
           <button
             type="button"
             onClick={() => {
-              onChange('')
-              setQuery('')
+              onChange('');
+              setQuery('');
             }}
             className="cursor-pointer absolute right-2 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600 focus:outline-none focus:text-gray-700"
             aria-label="Сбросить выбор"
@@ -181,5 +183,5 @@ export function Combobox({
       )}
       {error && <p className="text-xs text-red-600">{error}</p>}
     </div>
-  )
+  );
 }

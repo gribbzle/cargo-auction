@@ -2,7 +2,8 @@
 
 ## 1. Purpose
 
-This document defines the requirements, constraints, business scenarios, technical decisions, edge cases, and acceptance criteria that must be understood before implementation starts.
+This document defines the requirements, constraints, business scenarios, technical decisions, edge cases, and acceptance
+criteria that must be understood before implementation starts.
 
 The document is based on:
 
@@ -10,7 +11,8 @@ The document is based on:
 - `openapi.auctions.v0.json`;
 - the project constraint that the application must run in Docker.
 
-The OpenAPI specification is treated as the source of truth for API contracts. The frontend implementation must not invent or silently alter API structures, enum values, nullable fields, response formats, or error contracts.
+The OpenAPI specification is treated as the source of truth for API contracts. The frontend implementation must not
+invent or silently alter API structures, enum values, nullable fields, response formats, or error contracts.
 
 ---
 
@@ -27,7 +29,8 @@ The application must support:
 5. placing or changing a bid;
 6. observing the changed state after a successful mutation.
 
-The backend is not implemented. API behavior must be represented by MSW mocks that follow the OpenAPI contract and maintain mutable state after mutations.
+The backend is not implemented. API behavior must be represented by MSW mocks that follow the OpenAPI contract and
+maintain mutable state after mutations.
 
 ---
 
@@ -84,7 +87,8 @@ Docker setup must support:
 
 ## 4.2 Docker Is Part of the Definition of Done
 
-The implementation is not considered complete if the application works only through a host-installed Node.js environment.
+The implementation is not considered complete if the application works only through a host-installed Node.js
+environment.
 
 The final README must document the Docker-based startup procedure.
 
@@ -329,7 +333,8 @@ URL:
 /auctions/:auctionUuid/bets
 ```
 
-The exact presentation can be implemented as a dedicated page or a section/tab associated with the auction details, provided the required behavior remains directly accessible.
+The exact presentation can be implemented as a dedicated page or a section/tab associated with the auction details,
+provided the required behavior remains directly accessible.
 
 ---
 
@@ -416,7 +421,8 @@ The OpenAPI request schema contains additional filters. Those will be analyzed i
 Important distinction:
 
 - assignment-required filters are mandatory for the UI;
-- additional API-supported filters should not be exposed automatically unless they provide meaningful value and do not unnecessarily increase scope.
+- additional API-supported filters should not be exposed automatically unless they provide meaningful value and do not
+  unnecessarily increase scope.
 
 ---
 
@@ -463,7 +469,8 @@ The OpenAPI contract defines pagination metadata including:
 - `to`;
 - `total`.
 
-The list UI must use the server-provided pagination metadata rather than deriving page counts from the current array length.
+The list UI must use the server-provided pagination metadata rather than deriving page counts from the current array
+length.
 
 The pagination state must be coordinated with the URL filters.
 
@@ -640,7 +647,8 @@ current_price_no_vat / distance
 
 with `0` when distance is zero.
 
-This is treated as an API contract detail rather than a reason to duplicate business calculations in unrelated UI components.
+This is treated as an API contract detail rather than a reason to duplicate business calculations in unrelated UI
+components.
 
 ---
 
@@ -840,7 +848,8 @@ invalidate auction bets
 UI reflects new state
 ```
 
-This ensures that the application demonstrates real server-state synchronization rather than a local-only optimistic illusion.
+This ensures that the application demonstrates real server-state synchronization rather than a local-only optimistic
+illusion.
 
 ---
 
@@ -1269,4 +1278,5 @@ The next document is:
 docs/api-analysis.md
 ```
 
-It will contain the detailed OpenAPI analysis, including schemas, DTO relationships, enums, nullable fields, request/response contracts, validation errors, pagination, and mutation behavior.
+It will contain the detailed OpenAPI analysis, including schemas, DTO relationships, enums, nullable fields,
+request/response contracts, validation errors, pagination, and mutation behavior.

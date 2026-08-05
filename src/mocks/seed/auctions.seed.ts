@@ -1,58 +1,84 @@
-import type { AuctionListItem, AuctionShowResponse, BetItem } from '@/shared/api/dto'
-import { CITIES_MOCK } from '@/entities/city/model/cities.mock'
-import { faker } from '@/shared/lib/faker'
+import type { AuctionListItem, AuctionShowResponse, BetItem } from '@/shared/api/dto';
+import { CITIES_MOCK } from '@/entities/city/model/cities.mock';
+import { faker } from '@/shared/lib/faker';
 
 export interface AuctionSeed {
-  uuid: string
-  data: AuctionListItem
-  detail: AuctionShowResponse
-  bets: BetItem[]
+  uuid: string;
+  data: AuctionListItem;
+  detail: AuctionShowResponse;
+  bets: BetItem[];
 }
 
 function generateUuid(): string {
-  return crypto.randomUUID()
+  return crypto.randomUUID();
 }
 
-const cities = CITIES_MOCK
+const cities = CITIES_MOCK;
 
-const cargoTypes = ['Тент', 'Рефрижератор', 'Борт', 'Контейнер', 'Цистерна']
-const aucTypes: Array<'Request' | 'Up' | 'Down' | 'FixPrice'> = ['Request', 'Up', 'Down', 'FixPrice']
-const statuses: Array<'Planning' | 'Auction' | 'DeterminateWinner' | 'WaitDeal' | 'InProgress' | 'Finished' | 'Stopped' | 'Canceled'> = [
-  'Planning', 'Auction', 'DeterminateWinner', 'WaitDeal', 'InProgress', 'Finished', 'Stopped', 'Canceled',
-]
+const cargoTypes = ['Тент', 'Рефрижератор', 'Борт', 'Контейнер', 'Цистерна'];
+const aucTypes: Array<'Request' | 'Up' | 'Down' | 'FixPrice'> = [
+  'Request',
+  'Up',
+  'Down',
+  'FixPrice',
+];
+const statuses: Array<
+  | 'Planning'
+  | 'Auction'
+  | 'DeterminateWinner'
+  | 'WaitDeal'
+  | 'InProgress'
+  | 'Finished'
+  | 'Stopped'
+  | 'Canceled'
+> = [
+  'Planning',
+  'Auction',
+  'DeterminateWinner',
+  'WaitDeal',
+  'InProgress',
+  'Finished',
+  'Stopped',
+  'Canceled',
+];
 const tradingStatuses: Array<'NotParticipating' | 'Leading' | 'Losing' | 'Winner' | 'Confirmed'> = [
-  'NotParticipating', 'Leading', 'Losing', 'Winner', 'Confirmed',
-]
+  'NotParticipating',
+  'Leading',
+  'Losing',
+  'Winner',
+  'Confirmed',
+];
 
 function randomItem<T>(arr: T[]): T {
-  return arr[Math.floor(Math.random() * arr.length)] as T
+  return arr[Math.floor(Math.random() * arr.length)] as T;
 }
 
 function randomInt(min: number, max: number): number {
-  return Math.floor(Math.random() * (max - min + 1)) + min
+  return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
 function generateAuctionListItem(index: number): AuctionListItem {
-  const loadCity = randomItem(cities)
-  const unloadCity = randomItem(cities.filter((c) => c.gc_id !== loadCity.gc_id))
-  const aucType = randomItem(aucTypes)
+  const loadCity = randomItem(cities);
+  const unloadCity = randomItem(cities.filter((c) => c.gc_id !== loadCity.gc_id));
+  const aucType = randomItem(aucTypes);
 
   // Ensure first 8 auctions are active (can_set_bet = true) for demo purposes
-  const isActiveAuction = index < 8
-  const status = isActiveAuction ? 'Auction' as const : randomItem(statuses)
+  const isActiveAuction = index < 8;
+  const status = isActiveAuction ? ('Auction' as const) : randomItem(statuses);
   const tradingStatus = isActiveAuction
     ? randomItem(['NotParticipating', 'Leading', 'Losing', 'OnPending'] as const)
-    : randomItem(tradingStatuses)
+    : randomItem(tradingStatuses);
 
-  const currentPrice = randomInt(50000, 500000)
+  const currentPrice = randomInt(50000, 500000);
 
   // Generate start price based on auction type:
   // - Up/Down: start price is the initial (highest) price, current is lower
   // - FixPrice: start and current are the same (fixed price)
   // - Request: start price equals current price (no trading)
-  const startPrice = aucType === 'FixPrice' || aucType === 'Request'
-    ? currentPrice
-    : currentPrice + randomInt(10000, 100000)
+  const startPrice =
+    aucType === 'FixPrice' || aucType === 'Request'
+      ? currentPrice
+      : currentPrice + randomInt(10000, 100000);
 
   return {
     uuid: '',
@@ -76,8 +102,8 @@ function generateAuctionListItem(index: number): AuctionListItem {
       is_hide_organization: false,
     },
     route: (() => {
-      const loadDate = new Date(Date.now() + randomInt(1, 14) * 86400000)
-      const unloadDate = new Date(loadDate.getTime() + randomInt(1, 7) * 86400000)
+      const loadDate = new Date(Date.now() + randomInt(1, 14) * 86400000);
+      const unloadDate = new Date(loadDate.getTime() + randomInt(1, 7) * 86400000);
       return {
         load: {
           city: loadCity.name,
@@ -93,7 +119,7 @@ function generateAuctionListItem(index: number): AuctionListItem {
           city_gc_id: unloadCity.gc_id,
           points_count: 1,
         },
-      }
+      };
     })(),
     cargo: {
       name: `Груз ${index + 1}`,
@@ -138,9 +164,10 @@ function generateAuctionListItem(index: number): AuctionListItem {
         current: currentPrice,
         current_no_vat: Math.round(currentPrice * 0.8),
       },
-      your: tradingStatus !== 'NotParticipating'
-        ? { bet: true, last_bet: currentPrice + randomInt(-5000, 5000) }
-        : null,
+      your:
+        tradingStatus !== 'NotParticipating'
+          ? { bet: true, last_bet: currentPrice + randomInt(-5000, 5000) }
+          : null,
       red_bet_with_vat: false,
       red_bet_no_vat: false,
       is_last_bet_with_vat: false,
@@ -151,12 +178,12 @@ function generateAuctionListItem(index: number): AuctionListItem {
       consignor: 'Грузоотправитель',
       consignee: 'Грузополучатель',
     },
-  }
+  };
 }
 
 function generateAuctionDetail(item: AuctionListItem): AuctionShowResponse {
-  const distance = randomInt(100, 3000)
-  const currentPrice = item.trading.price?.current ?? 100000
+  const distance = randomInt(100, 3000);
+  const currentPrice = item.trading.price?.current ?? 100000;
 
   return {
     main: {
@@ -277,7 +304,17 @@ function generateAuctionDetail(item: AuctionListItem): AuctionShowResponse {
           lon: 0,
           lat: 0,
         },
-        cargo: { name: '', package_name: '', weight: '', volume: '', length: '', width: '', height: '', oversized: false, package_amount: null },
+        cargo: {
+          name: '',
+          package_name: '',
+          weight: '',
+          volume: '',
+          length: '',
+          width: '',
+          height: '',
+          oversized: false,
+          package_amount: null,
+        },
         contact: { name: faker.person.fullName(), phone: faker.phone.number() },
       },
       {
@@ -296,19 +333,33 @@ function generateAuctionDetail(item: AuctionListItem): AuctionShowResponse {
           lon: 0,
           lat: 0,
         },
-        cargo: { name: '', package_name: '', weight: '', volume: '', length: '', width: '', height: '', oversized: false, package_amount: null },
+        cargo: {
+          name: '',
+          package_name: '',
+          weight: '',
+          volume: '',
+          length: '',
+          width: '',
+          height: '',
+          oversized: false,
+          package_amount: null,
+        },
         contact: { name: faker.person.fullName(), phone: faker.phone.number() },
       },
     ],
     admitted_organizations: [],
     hide_bets_history: false,
-  }
+  };
 }
 
-function generateBets(auctionId: number, count: number, userBet?: { price_with_vat: number; price_no_vat: number }): BetItem[] {
+function generateBets(
+  auctionId: number,
+  count: number,
+  userBet?: { price_with_vat: number; price_no_vat: number }
+): BetItem[] {
   const otherBets: BetItem[] = Array.from({ length: count }, (_, i) => {
-    const priceNoVat = randomInt(40000, 400000)
-    const priceWithVat = Math.round(priceNoVat * 1.2)
+    const priceNoVat = randomInt(40000, 400000);
+    const priceWithVat = Math.round(priceNoVat * 1.2);
     return {
       id: auctionId * 1000 + i + 1,
       created_at: new Date(Date.now() - randomInt(0, 48) * 3600000).toISOString(),
@@ -334,8 +385,8 @@ function generateBets(auctionId: number, count: number, userBet?: { price_with_v
         payment_type: 'Безналичный',
         vat_rate: '20',
       },
-    }
-  })
+    };
+  });
 
   const bets = userBet
     ? [
@@ -367,38 +418,42 @@ function generateBets(auctionId: number, count: number, userBet?: { price_with_v
           },
         },
       ]
-    : otherBets
+    : otherBets;
 
   bets
     .filter((b) => !b.is_rejected)
-    .sort((a, b) => a.price_with_vat - b.price_with_vat)
+    .sort((a, b) => b.price_with_vat - a.price_with_vat)
     .forEach((b, i) => {
-      b.place = i + 1
-      b.is_win = i === 0
-    })
+      b.place = i + 1;
+      b.is_win = i === 0;
+    });
 
-  return bets
+  return bets;
 }
 
 export function generateSeedData(): AuctionSeed[] {
-  const count = 25
+  const count = 25;
   const items = Array.from({ length: count }, (_, i) => {
-    const item = generateAuctionListItem(i)
-    const uuid = generateUuid()
-    item.uuid = uuid
-    return { item, uuid }
-  })
+    const item = generateAuctionListItem(i);
+    const uuid = generateUuid();
+    item.uuid = uuid;
+    return { item, uuid };
+  });
 
   return items.map(({ item, uuid }) => {
-    const userBet = item.trading.your?.last_bet != null
-      ? { price_with_vat: item.trading.your.last_bet, price_no_vat: Math.round(item.trading.your.last_bet * 0.8) }
-      : undefined
+    const userBet =
+      item.trading.your?.last_bet != null
+        ? {
+            price_with_vat: item.trading.your.last_bet,
+            price_no_vat: Math.round(item.trading.your.last_bet * 0.8),
+          }
+        : undefined;
 
     return {
       uuid,
       data: item,
       detail: generateAuctionDetail(item),
       bets: generateBets(item.main.id, randomInt(0, 8), userBet),
-    }
-  })
+    };
+  });
 }
