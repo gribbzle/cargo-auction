@@ -103,23 +103,54 @@ export function Combobox({
   return (
     <div className={`flex flex-col gap-1 relative ${className}`} ref={containerRef}>
       {label && <label className="text-sm font-medium text-gray-700" htmlFor={id}>{label}</label>}
-      <input
-        id={id}
-        ref={inputRef}
-        type="text"
-        value={isOpen ? query : selectedLabel}
-        onChange={(e) => {
-          setQuery(e.target.value)
-          if (!isOpen) open()
-        }}
-        onFocus={open}
-        onKeyDown={handleKeyDown}
-        placeholder={placeholder}
-        className={`rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500 ${error ? 'border-red-500' : ''}`}
-        role="combobox"
-        aria-expanded={isOpen}
-        aria-autocomplete="list"
-      />
+      <div className="relative">
+        <input
+          id={id}
+          ref={inputRef}
+          type="text"
+          value={isOpen ? query : selectedLabel}
+          onChange={(e) => {
+            setQuery(e.target.value)
+            if (!isOpen) open()
+          }}
+          onFocus={open}
+          onKeyDown={handleKeyDown}
+          placeholder={placeholder}
+          className={`cursor-pointer w-full rounded-lg border border-gray-300 px-3 py-2 pr-8 text-sm text-gray-900 placeholder:text-gray-400 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500 ${error ? 'border-red-500' : ''}`}
+          role="combobox"
+          aria-expanded={isOpen}
+          aria-autocomplete="list"
+        />
+        {value && (
+          <button
+            type="button"
+            onClick={() => {
+              onChange('')
+              setQuery('')
+            }}
+            className="cursor-pointer absolute right-2 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600 focus:outline-none focus:text-gray-700"
+            aria-label="Сбросить выбор"
+            tabIndex={-1}
+          >
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 14 14"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+            >
+              <path
+                d="M4 4l6 6M10 4L4 10"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
+        )}
+      </div>
       {isOpen && filtered.length > 0 && (
         <ul
           ref={listRef}
