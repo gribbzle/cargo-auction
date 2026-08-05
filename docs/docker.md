@@ -34,7 +34,7 @@ services:
       - /app/node_modules # Prevents local node_modules from overwriting container modules
     environment:
       - NODE_ENV=development
-      - VITE_API_URL=http://localhost:5173/api # Proxying to MSW/Vite
+      - VITE_API_URL=/api/v1 # MSW intercepts on this path
     networks:
       - cargo-auction-network
 
