@@ -7,6 +7,7 @@ import { FavoriteButton } from '@/features/favorite-toggle';
 import { formatCurrency, formatWeight, formatVolume, formatDate } from '../lib/formatters';
 import { getAuctionTypeBadge, getStatusBadge, getTradingStatusBadge } from '../lib/badges';
 import { getActionButton } from '../lib/action';
+import { getBidMeasurementLabel } from '@/entities/auction/model/auction.constants';
 
 interface AuctionCardProps {
   auction: AuctionListItem;
@@ -103,6 +104,11 @@ export function AuctionCard({ auction }: AuctionCardProps) {
             <span className="text-gray-500 text-xs block">Цена за км</span>
             <span className="text-gray-900">{formatCurrency(main.price_per_km)}</span>
           </div>
+        )}
+        {trading.bid_measurement_type && (
+          <Badge variant="info" className="text-xs">
+            {getBidMeasurementLabel(trading.bid_measurement_type)}
+          </Badge>
         )}
         <div>
           <span className="text-gray-500 text-xs block">Моя ставка</span>
