@@ -44,7 +44,7 @@ export function FavoriteButton({ auctionUuid, isFavorite }: FavoriteButtonProps)
       disabled={mutation.isPending}
       aria-label={isFavorite ? 'Убрать из избранного' : 'Добавить в избранное'}
       aria-pressed={isFavorite}
-      className={`text-2xl transition-colors hover:scale-110 disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 rounded ${
+      className={`cursor-pointer text-2xl transition-colors hover:scale-110 disabled:cursor-not-allowed disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 rounded ${
         isFavorite ? 'text-amber-500' : 'text-gray-300 hover:text-amber-400'
       }`}
     >
