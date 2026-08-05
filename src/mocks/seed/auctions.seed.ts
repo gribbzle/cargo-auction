@@ -46,6 +46,14 @@ function generateAuctionListItem(index: number): AuctionListItem {
 
   const currentPrice = randomInt(50000, 500000)
 
+  // Generate start price based on auction type:
+  // - Up/Down: start price is the initial (highest) price, current is lower
+  // - FixPrice: start and current are the same (fixed price)
+  // - Request: start price equals current price (no trading)
+  const startPrice = aucType === 'FixPrice' || aucType === 'Request'
+    ? currentPrice
+    : currentPrice + randomInt(10000, 100000)
+
   return {
     uuid: '',
     main: {
@@ -62,7 +70,7 @@ function generateAuctionListItem(index: number): AuctionListItem {
     organizer: {
       subscriber_id: randomInt(1, 100),
       organization_id: randomInt(1, 50),
-      organization_name: `ООО "${faker.company.name()}"`,
+      organization_name: faker.company.name(),
       organization_inn: `${randomInt(7700000000, 7799999999)}`,
       organization_kpp: `${randomInt(770001000, 770099999)}`,
       is_hide_organization: false,
@@ -73,14 +81,14 @@ function generateAuctionListItem(index: number): AuctionListItem {
       return {
         load: {
           city: loadCity.name,
-          address: `ул. Тестовая, ${randomInt(1, 100)}`,
+          address: faker.location.streetAddress(),
           date: loadDate.toISOString(),
           city_gc_id: loadCity.gc_id,
           points_count: 1,
         },
         unload: {
           city: unloadCity.name,
-          address: `ул. Доставки, ${randomInt(1, 100)}`,
+          address: faker.location.streetAddress(),
           date: unloadDate.toISOString(),
           city_gc_id: unloadCity.gc_id,
           points_count: 1,
@@ -126,7 +134,7 @@ function generateAuctionListItem(index: number): AuctionListItem {
       is_accredited: true,
       is_favorite: Math.random() > 0.7,
       price: {
-        start: currentPrice + randomInt(10000, 100000),
+        start: startPrice,
         current: currentPrice,
         current_no_vat: Math.round(currentPrice * 0.8),
       },
@@ -265,7 +273,7 @@ function generateAuctionDetail(item: AuctionListItem): AuctionShowResponse {
           city_name: item.route.load.city,
           city_full_name: item.route.load.city,
           city_gc_id: item.route.load.city_gc_id,
-          loading_address: `${faker.location.streetAddress()}`,
+          loading_address: faker.location.streetAddress(),
           lon: 0,
           lat: 0,
         },
@@ -284,7 +292,7 @@ function generateAuctionDetail(item: AuctionListItem): AuctionShowResponse {
           city_name: item.route.unload.city,
           city_full_name: item.route.unload.city,
           city_gc_id: item.route.unload.city_gc_id,
-          loading_address: `${faker.location.streetAddress()}`,
+          loading_address: faker.location.streetAddress(),
           lon: 0,
           lat: 0,
         },
@@ -298,32 +306,36 @@ function generateAuctionDetail(item: AuctionListItem): AuctionShowResponse {
 }
 
 function generateBets(auctionId: number, count: number, userBet?: { price_with_vat: number; price_no_vat: number }): BetItem[] {
-  const otherBets: BetItem[] = Array.from({ length: count }, (_, i) => ({
-    id: auctionId * 1000 + i + 1,
-    created_at: new Date(Date.now() - randomInt(0, 48) * 3600000).toISOString(),
-    auction_id: auctionId,
-    subscriber_id: randomInt(1, 100),
-    contact_name: faker.person.fullName(),
-    contact_phone: `+7 (${randomInt(900, 999)}) ${randomInt(100, 999)}-${randomInt(10, 99)}-${randomInt(10, 99)}`,
-    price_with_vat: randomInt(50000, 500000),
-    price_no_vat: randomInt(40000, 400000),
-    organization_id: randomInt(1, 50),
-    organization_inn: `${randomInt(7700000000, 7799999999)}`,
-    organization_name: `ООО "${faker.company.name()}"`,
-    transporter_comment: null,
-    is_rejected: i === count - 1 && Math.random() > 0.7,
-    is_counter: false,
-    place: null,
-    is_win: false,
-    run_number: 0,
-    cancel_reason: i === count - 1 && Math.random() > 0.7 ? 'Не прошёл отбор' : '',
-    price_info: {
-      price_with_vat: randomInt(50000, 500000),
-      price_no_vat: randomInt(40000, 400000),
-      payment_type: 'Безналичный',
-      vat_rate: '20',
-    },
-  }))
+  const otherBets: BetItem[] = Array.from({ length: count }, (_, i) => {
+    const priceNoVat = randomInt(40000, 400000)
+    const priceWithVat = Math.round(priceNoVat * 1.2)
+    return {
+      id: auctionId * 1000 + i + 1,
+      created_at: new Date(Date.now() - randomInt(0, 48) * 3600000).toISOString(),
+      auction_id: auctionId,
+      subscriber_id: randomInt(1, 100),
+      contact_name: faker.person.fullName(),
+      contact_phone: faker.phone.number(),
+      price_with_vat: priceWithVat,
+      price_no_vat: priceNoVat,
+      organization_id: randomInt(1, 50),
+      organization_inn: `${randomInt(7700000000, 7799999999)}`,
+      organization_name: faker.company.name(),
+      transporter_comment: null,
+      is_rejected: i === count - 1 && Math.random() > 0.7,
+      is_counter: false,
+      place: null,
+      is_win: false,
+      run_number: 0,
+      cancel_reason: i === count - 1 && Math.random() > 0.7 ? 'Не прошёл отбор' : '',
+      price_info: {
+        price_with_vat: priceWithVat,
+        price_no_vat: priceNoVat,
+        payment_type: 'Безналичный',
+        vat_rate: '20',
+      },
+    }
+  })
 
   const bets = userBet
     ? [
