@@ -17,7 +17,9 @@
   },
   "lint-staged": {
     "*.{ts,tsx,js,jsx,json,md,css}": [
-      "prettier --write",
+      "prettier --write"
+    ],
+    "*.{ts,tsx,js,jsx}": [
       "oxlint --fix"
     ]
   },
