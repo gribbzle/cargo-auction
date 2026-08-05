@@ -112,7 +112,11 @@ export function AuctionsListPage() {
             </p>
           </div>
         ) : (
-          data?.data.map((auction) => <AuctionCard key={auction.uuid} auction={auction} />)
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {data?.data.map((auction) => (
+              <AuctionCard key={auction.uuid} auction={auction} />
+            ))}
+          </div>
         )}
       </div>
 

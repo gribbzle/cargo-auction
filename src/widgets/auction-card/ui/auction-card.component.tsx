@@ -72,7 +72,7 @@ export function AuctionCard({ auction }: AuctionCardProps) {
       </div>
 
       {/* Cargo info */}
-      <div className="mb-3 grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
+      <div className="mb-3 grid grid-cols-2 lg:grid-cols-4 gap-3 text-sm overflow-hidden">
         <div>
           <span className="text-gray-500 text-xs block">Груз</span>
           <span className="text-gray-900">{cargo.name}</span>
@@ -85,9 +85,11 @@ export function AuctionCard({ auction }: AuctionCardProps) {
           <span className="text-gray-500 text-xs block">Объём</span>
           <span className="text-gray-900">{formatVolume(cargo.volume)}</span>
         </div>
-        <div>
+        <div className="flex flex-col">
           <span className="text-gray-500 text-xs block">Кузов</span>
-          <span className="text-gray-900">{cargo.body_type}</span>
+          <span className="text-gray-900 whitespace-nowrap overflow-hidden text-ellipsis">
+            {cargo.body_type}
+          </span>
         </div>
       </div>
 
@@ -119,8 +121,10 @@ export function AuctionCard({ auction }: AuctionCardProps) {
       </div>
 
       {/* Action button */}
-      <div className="flex items-center justify-between" onClick={(e) => e.stopPropagation()}>
-        <span className="text-xs text-gray-500">{organizer.organization_name}</span>
+      <div className="flex items-center justify-between gap-2" onClick={(e) => e.stopPropagation()}>
+        <span className="text-xs text-gray-500 whitespace-nowrap overflow-hidden text-ellipsis">
+          {organizer.organization_name}
+        </span>
         {action.disabled ? (
           <span
             aria-disabled="true"
@@ -132,7 +136,7 @@ export function AuctionCard({ auction }: AuctionCardProps) {
           <Link
             to={action.href}
             aria-label={`${action.label} — ${main.cargo_num}`}
-            className="inline-flex items-center rounded-lg bg-sky-600 px-4 py-2 text-sm font-medium text-white hover:bg-sky-700 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:ring-offset-2"
+            className="inline-flex items-center rounded-lg bg-sky-600 px-4 py-2 text-sm font-medium text-white hover:bg-sky-700 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:ring-offset-2 shrink-0"
           >
             {action.label}
           </Link>

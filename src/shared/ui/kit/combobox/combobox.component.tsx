@@ -122,6 +122,10 @@ export function Combobox({
           role="combobox"
           aria-expanded={isOpen}
           aria-autocomplete="list"
+          aria-controls={isOpen ? `${id}-listbox` : undefined}
+          aria-activedescendant={
+            isOpen && activeIndex >= 0 ? `${id}-option-${activeIndex}` : undefined
+          }
         />
         {value && (
           <button
@@ -156,12 +160,14 @@ export function Combobox({
       {isOpen && filtered.length > 0 && (
         <ul
           ref={listRef}
+          id={`${id}-listbox`}
           role="listbox"
           className="absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-lg border border-gray-200 bg-white shadow-lg"
         >
           {filtered.map((opt, i) => (
             <li
               key={opt.value}
+              id={`${id}-option-${i}`}
               role="option"
               aria-selected={opt.value === value}
               className={`cursor-pointer px-3 py-2 text-sm hover:bg-sky-50 ${i === activeIndex ? 'bg-sky-100' : ''} ${opt.value === value ? 'bg-sky-50 font-medium' : ''}`}
